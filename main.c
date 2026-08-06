@@ -2,7 +2,20 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+void clear_terminal() {
+#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+    system("clear");
+#endif
+#if defined(_WIN32) || defined(_WIN64)
+    system("cls");
+#endif
+}
+
+static bool running = true;
 
 enum {
     CHARACTER_NAME_LENGTH = 16,
@@ -122,6 +135,12 @@ static const char *get_job_string(const enum job job_id) {
     }
 }
 
+void delay(const int milliseconds) {
+    clock_t start = clock();
+    while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
+        ;
+}
+
 int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
 
@@ -144,15 +163,8 @@ int clean_input(char string[], const size_t string_size) {
     return STATUS_OKAY;
 }
 
-int main(void) {
-    struct character party[4];
-    size_t party_size = 0;
-    bool running = true;
-
-    char player[CHARACTER_NAME_LENGTH];
-
-    int input = clean_input(player, sizeof(player));
-    switch (input) {
+void read_status(enum status status_id) {
+    switch (status_id) {
         case STATUS_NULL_INPUT:
             printf("You cannot input NULL\n");
             break;
@@ -160,15 +172,38 @@ int main(void) {
             printf("Input too long\n");
             break;
         case STATUS_OKAY:
-            printf("%s\n", player);
             break;
         default:
             printf("CRITICAL ERROR\n");
             break;
     }
+}
 
-    printf("Player is: %zu bytes.\n", sizeof(player));
-    printf("Output: %s\n", player);
+void render_menu() {
+    while (running) {
+        clear_terminal();
+        printf("1| Add\n2| View\n3| Change\n4| Quit\n");
+        char input[2];
+        enum status result = clean_input(input, sizeof(input));
+        if (result == 0) {
+            clear_terminal();
+            printf("%s", input);
+            delay(1000);
+        } else {
+            clear_terminal();
+            read_status(result);
+            delay(1000);
+        }
+    }
+}
+
+int main(void) {
+    struct character party[4];
+    size_t party_size = 0;
+
+    while (running) {
+        render_menu();
+    }
 
     return 0;
 }
