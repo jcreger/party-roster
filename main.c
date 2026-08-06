@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <inttypes.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 enum {
     CHARACTER_NAME_LENGTH = 16,
@@ -9,17 +11,14 @@ enum {
     MAX_JOB_COUNT = 6
 };
 
-enum menu_option {
-    MENU_ADD,
-    MENU_VIEW,
-    MENU_CHANGE,
-    MENU_QUIT
-};
+enum menu_option { MENU_ADD, MENU_VIEW, MENU_CHANGE, MENU_QUIT = 0 };
 
 enum status {
-    STATUS_OKAY,
+    STATUS_OKAY = 0,
     STATUS_NOT_FOUND,
     STATUS_INVALID_INPUT,
+    STATUS_NULL_INPUT,
+    STATUS_LONG_INPUT,
     STATUS_LIST_FULL
 };
 
@@ -32,12 +31,7 @@ enum job {
     JOB_ASSASSIN
 };
 
-enum item_type {
-    ITEM_WEAPON,
-    ITEM_ARMOR,
-    ITEM_RECOVERY,
-    ITEM_KEYITEM
-};
+enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
 
 struct stats {
     uint8_t strength;
@@ -128,16 +122,53 @@ static const char *get_job_string(const enum job job_id) {
     }
 }
 
+int clean_input(char string[], const size_t string_size) {
+    assert(string_size >= 1);
+
+    if (fgets(string, string_size, stdin) == NULL) {
+        return STATUS_NULL_INPUT;
+    }
+
+    if (strchr(string, '\n') == NULL) {
+        int c = getchar();
+
+        if (c != '\n' && c != EOF) {
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
+            memset(string, '\0', string_size);
+            return STATUS_LONG_INPUT;
+        }
+    } else {
+        string[strcspn(string, "\n")] = '\0';
+    }
+    return STATUS_OKAY;
+}
+
 int main(void) {
     struct character party[4];
     size_t party_size = 0;
-    bool running = 1;
+    bool running = true;
 
-    while(running) {
+    char player[CHARACTER_NAME_LENGTH];
 
+    int input = clean_input(player, sizeof(player));
+    switch (input) {
+        case STATUS_NULL_INPUT:
+            printf("You cannot input NULL\n");
+            break;
+        case STATUS_LONG_INPUT:
+            printf("Input too long\n");
+            break;
+        case STATUS_OKAY:
+            printf("%s\n", player);
+            break;
+        default:
+            printf("CRITICAL ERROR\n");
+            break;
     }
 
-
+    printf("Player is: %zu bytes.\n", sizeof(player));
+    printf("Output: %s\n", player);
 
     return 0;
 }
