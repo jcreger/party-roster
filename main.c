@@ -1,10 +1,26 @@
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 enum {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
-    MAX_ITEM_COUNT = 255
+    MAX_ITEM_COUNT = 255,
+    MAX_JOB_COUNT = 6
+};
+
+enum menu_option {
+    MENU_ADD,
+    MENU_VIEW,
+    MENU_CHANGE,
+    MENU_QUIT
+};
+
+enum status {
+    STATUS_OKAY,
+    STATUS_NOT_FOUND,
+    STATUS_INVALID_INPUT,
+    STATUS_LIST_FULL
 };
 
 enum job {
@@ -17,10 +33,10 @@ enum job {
 };
 
 enum item_type {
-    ITEM_TYPE_WEAPON,
-    ITEM_TYPE_ARMOR,
-    ITEM_TYPE_RECOVERY,
-    ITEM_TYPE_KEYITEM
+    ITEM_WEAPON,
+    ITEM_ARMOR,
+    ITEM_RECOVERY,
+    ITEM_KEYITEM
 };
 
 struct stats {
@@ -30,6 +46,45 @@ struct stats {
     uint8_t stamina;
     uint8_t resilience;
     uint8_t spirit;
+};
+
+struct stats stats_table[MAX_JOB_COUNT] = {
+    [JOB_FIGHTER] = {.strength = 20,
+                     .agility = 10,
+                     .intelligence = 5,
+                     .stamina = 15,
+                     .resilience = 10,
+                     .spirit = 5},
+    [JOB_THIEF] = {.strength = 10,
+                   .agility = 20,
+                   .intelligence = 5,
+                   .stamina = 10,
+                   .resilience = 15,
+                   .spirit = 5},
+    [JOB_MAGE] = {.strength = 5,
+                  .agility = 5,
+                  .intelligence = 20,
+                  .stamina = 10,
+                  .resilience = 10,
+                  .spirit = 15},
+    [JOB_ROGUE] = {.strength = 15,
+                   .agility = 20,
+                   .intelligence = 5,
+                   .stamina = 10,
+                   .resilience = 10,
+                   .spirit = 5},
+    [JOB_PALADIN] = {.strength = 15,
+                     .agility = 5,
+                     .intelligence = 10,
+                     .stamina = 15,
+                     .resilience = 10,
+                     .spirit = 10},
+    [JOB_ASSASSIN] = {.strength = 10,
+                      .agility = 15,
+                      .intelligence = 15,
+                      .stamina = 10,
+                      .resilience = 10,
+                      .spirit = 5},
 };
 
 struct item_definition {
@@ -76,6 +131,13 @@ static const char *get_job_string(const enum job job_id) {
 int main(void) {
     struct character party[4];
     size_t party_size = 0;
+    bool running = 1;
+
+    while(running) {
+
+    }
+
+
 
     return 0;
 }
