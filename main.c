@@ -24,7 +24,14 @@ enum {
     DELAY_MENU = 1000
 };
 
-enum menu_option { MENU_ADD, MENU_VIEW, MENU_CHANGE, MENU_QUIT, MENU_COUNT };
+enum menu_option {
+    MENU_ADD,
+    MENU_VIEW,
+    MENU_CHANGE,
+    MENU_REMOVE,
+    MENU_QUIT,
+    MENU_COUNT
+};
 
 enum status {
     STATUS_OKAY,
@@ -32,7 +39,8 @@ enum status {
     STATUS_INVALID_INPUT,
     STATUS_NULL_INPUT,
     STATUS_LONG_INPUT,
-    STATUS_LIST_FULL
+    STATUS_LIST_FULL,
+    STATUS_EMPTY
 };
 
 enum job {
@@ -136,6 +144,23 @@ static const char *get_job_string(const enum job job_id) {
     }
 }
 
+static const char *get_menu_string(const enum menu_option option_id) {
+    switch (option_id) {
+        case MENU_ADD:
+            return "Add a character";
+        case MENU_VIEW:
+            return "View party";
+        case MENU_CHANGE:
+            return "Change stats";
+        case MENU_QUIT:
+            return "Quit";
+        case MENU_REMOVE:
+            return "Remove a character";
+        default:
+            return "Undefined";
+    }
+}
+
 // Bad implementation of delay that doesn't require specific system headers
 void delay(const int milliseconds) {
     clock_t start = clock();
@@ -184,6 +209,9 @@ void read_status(enum status status_id) {
         case STATUS_NOT_FOUND:
             printf("Not found\n");
             break;
+        case STATUS_EMPTY:
+            printf("Party is empty\n");
+            break;
     }
 }
 
@@ -198,8 +226,10 @@ void wait_enter() {
 enum menu_option render_menu(const size_t party_size) {
     while (true) {
         clear_terminal();
-        printf("%zu/4 Characters\n\n1| Add\n2| View\n3| Change\n4| Quit\n",
-               party_size);
+        printf("%zu/4 Characters\n\n", party_size);
+        for (int i = 0; i < MENU_COUNT; i++) {
+            printf("%d| %s\n", i + 1, get_menu_string(i));
+        }
         char input[INPUT_LENGTH];
         enum status input_status = clean_input(input, sizeof(input));
         if (input_status == STATUS_OKAY) {
@@ -242,9 +272,9 @@ void add_character(struct character party[], size_t *party_size) {
         }
         while (job_status != STATUS_OKAY) {
             clear_terminal();
-            printf("Pick a class:\n1| %s\n2| %s\n3| %s\n4| %s\n5| %s\n6| %s\n",
-                   get_job_string(0), get_job_string(1), get_job_string(2),
-                   get_job_string(3), get_job_string(4), get_job_string(5));
+            for (int i = 0; i < JOB_COUNT; i++) {
+                printf("%d| %s\n", i + 1, get_job_string(i));
+            }
             job_status = clean_input(job, sizeof(job));
             if (job_status == STATUS_OKAY) {
                 job_id = atoi(job) - 1;
@@ -264,7 +294,7 @@ void add_character(struct character party[], size_t *party_size) {
         (*party_size)++;
         clear_terminal();
         printf(
-            "%s added\n\nJob: %s\n\nStrength: %u\nAgility: %u\nIntelligence: "
+            "Name: %s\n\nJob: %s\n\nStrength: %u\nAgility: %u\nIntelligence: "
             "%u\nStamina: %u\nResilience: %u\nSpirit: %u\n",
             name, get_job_string(job_id), party[index].stats.strength,
             party[index].stats.agility, party[index].stats.intelligence,
@@ -273,6 +303,17 @@ void add_character(struct character party[], size_t *party_size) {
         wait_enter();
     } else {
         input_status = STATUS_LIST_FULL;
+        read_status(input_status);
+        wait_enter();
+    }
+}
+
+void remove_character(struct character party[], size_t party_size) {
+    enum status input_status;
+
+    if (party_size > 0) {
+    } else {
+        input_status = STATUS_EMPTY;
         read_status(input_status);
         wait_enter();
     }
@@ -298,6 +339,10 @@ int main(void) {
             case MENU_QUIT:
                 printf("MENU_QUIT\n");
                 running = false;
+                break;
+            case MENU_REMOVE:
+                printf("MENU_REMOVE\n");
+                remove_character(party, party_size);
                 break;
             default:
                 printf("Undefined\n");
