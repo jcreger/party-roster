@@ -40,7 +40,8 @@ enum status {
     STATUS_NULL_INPUT,
     STATUS_LONG_INPUT,
     STATUS_LIST_FULL,
-    STATUS_EMPTY
+    STATUS_EMPTY,
+    STATUS_INVALID_OPTION
 };
 
 enum job {
@@ -171,6 +172,30 @@ void delay(const int milliseconds) {
 // Cleans user input and will return status
 int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
+    if (fgets(string, string_size, stdin) != NULL) {
+        if (strchr(string, '\n') == NULL) {
+            int c = getchar();
+            if (c != '\n' && c != EOF) {
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ;
+                memset(string, '\0', string_size);
+                return STATUS_LONG_INPUT;
+            } else {
+                return STATUS_OKAY;
+            }
+        } else {
+            string[strcspn(string, "\n")] = '\0';
+            return STATUS_OKAY;
+        }
+    } else {
+        return STATUS_NULL_INPUT;
+    }
+}
+
+// Cleans user input and converts string to integer return status
+enum status clean_input_int(int *num, int digit_count) {
+    char string[digit_count + 1];
+    size_t string_size = sizeof(string);
     if (fgets(string, string_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
     }
@@ -182,10 +207,15 @@ int clean_input(char string[], const size_t string_size) {
             memset(string, '\0', string_size);
             return STATUS_LONG_INPUT;
         }
+        if (atoi(string) != 0) {
+            *num = atoi(string);
+            return STATUS_OKAY;
+        } else {
+            return STATUS_INVALID_INPUT;
+        }
     } else {
-        string[strcspn(string, "\n")] = '\0';
+        return STATUS_INVALID_INPUT;
     }
-    return STATUS_OKAY;
 }
 
 // Print user error messages
@@ -212,6 +242,9 @@ void read_status(enum status status_id) {
         case STATUS_EMPTY:
             printf("Party is empty\n");
             break;
+        case STATUS_INVALID_OPTION:
+            printf("Not an option");
+            break;
     }
 }
 
@@ -224,20 +257,22 @@ void wait_enter() {
 
 // Render the main menu and return valid user input
 enum menu_option render_menu(const size_t party_size) {
+    int input;
+    enum status input_status;
+
     while (true) {
         clear_terminal();
         printf("%zu/4 Characters\n\n", party_size);
         for (int i = 0; i < MENU_COUNT; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
-        char input[INPUT_LENGTH];
-        enum status input_status = clean_input(input, sizeof(input));
+        input_status = clean_input_int(&input, 1);
         if (input_status == STATUS_OKAY) {
-            enum menu_option user_input = atoi(input) - 1;
-            if (user_input < MENU_COUNT && user_input >= 0) {
-                return user_input;
+            input--;
+            if (input < MENU_COUNT && input >= 0) {
+                return input;
             } else {
-                input_status = STATUS_INVALID_INPUT;
+                input_status = STATUS_INVALID_OPTION;
                 read_status(input_status);
                 wait_enter();
             }
@@ -251,11 +286,10 @@ enum menu_option render_menu(const size_t party_size) {
 // Creates a new character struct in party
 void add_character(struct character party[], size_t *party_size) {
     char name[CHARACTER_NAME_LENGTH];
-    char job[INPUT_LENGTH];
     enum status input_status;
     enum status name_status;
     enum status job_status;
-    enum job job_id;
+    int job_id;
     int index = *party_size;
 
     if (*party_size < MAX_PARTY_SIZE) {
@@ -275,14 +309,14 @@ void add_character(struct character party[], size_t *party_size) {
             for (int i = 0; i < JOB_COUNT; i++) {
                 printf("%d| %s\n", i + 1, get_job_string(i));
             }
-            job_status = clean_input(job, sizeof(job));
+            job_status = clean_input_int(&job_id, 1);
             if (job_status == STATUS_OKAY) {
-                job_id = atoi(job) - 1;
+                job_id--;
                 if (job_id < JOB_COUNT && job_id >= 0) {
                     party[index].job = job_id;
                     party[index].stats = stats_table[job_id];
                 } else {
-                    job_status = STATUS_INVALID_INPUT;
+                    job_status = STATUS_INVALID_OPTION;
                     read_status(job_status);
                     wait_enter();
                 }
