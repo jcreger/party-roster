@@ -190,7 +190,7 @@ void read_status(enum status status_id) {
 // Waits until user inputs anything to continue
 void wait_enter() {
     char input;
-    printf("press enter to continue...\n");
+    printf("\npress enter to continue...\n");
     clean_input(&input, sizeof(input));
 }
 
