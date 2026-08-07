@@ -18,7 +18,9 @@ void clear_terminal() {
 enum {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
+    INPUT_LENGTH = 2,
     MAX_ITEM_COUNT = 255,
+    MAX_PARTY_SIZE = 4,
     DELAY_MENU = 1000
 };
 
@@ -130,7 +132,7 @@ static const char *get_job_string(const enum job job_id) {
         case JOB_ASSASSIN:
             return "Assassin";
         default:
-            return "Unknown";
+            return "Undefined";
     }
 }
 
@@ -163,6 +165,7 @@ int clean_input(char string[], const size_t string_size) {
 
 // Print user error messages
 void read_status(enum status status_id) {
+    clear_terminal();
     switch (status_id) {
         case STATUS_NULL_INPUT:
             printf("You cannot input NULL\n");
@@ -184,35 +187,107 @@ void read_status(enum status status_id) {
     }
 }
 
+// Waits until user inputs anything to continue
+void wait_enter() {
+    char input;
+    printf("press enter to continue...\n");
+    clean_input(&input, sizeof(input));
+}
+
 // Render the main menu and return valid user input
-enum menu_option render_menu() {
+enum menu_option render_menu(const size_t party_size) {
     while (true) {
-        printf("1| Add\n2| View\n3| Change\n4| Quit\n");
-        char input[2];
-        enum status input_result = clean_input(input, sizeof(input));
-        if (input_result == STATUS_OKAY) {
+        clear_terminal();
+        printf("%zu/4 Characters\n\n1| Add\n2| View\n3| Change\n4| Quit\n",
+               party_size);
+        char input[INPUT_LENGTH];
+        enum status input_status = clean_input(input, sizeof(input));
+        if (input_status == STATUS_OKAY) {
             enum menu_option user_input = atoi(input) - 1;
             if (user_input < MENU_COUNT && user_input >= 0) {
                 return user_input;
             } else {
-                read_status(STATUS_INVALID_INPUT);
+                input_status = STATUS_INVALID_INPUT;
+                read_status(input_status);
+                wait_enter();
             }
         } else {
-            read_status(input_result);
+            read_status(input_status);
+            wait_enter();
         }
     }
 }
 
+// Creates a new character struct in party
+void add_character(struct character party[], size_t *party_size) {
+    char name[CHARACTER_NAME_LENGTH];
+    char job[INPUT_LENGTH];
+    enum status input_status;
+    enum status name_status;
+    enum status job_status;
+    enum job job_id;
+    int index = *party_size;
+
+    if (*party_size < MAX_PARTY_SIZE) {
+        while (name_status != STATUS_OKAY) {
+            clear_terminal();
+            printf("Name: ");
+            name_status = clean_input(name, sizeof(name));
+            if (name_status == STATUS_OKAY) {
+                strcpy(party[index].name, name);
+            } else {
+                read_status(name_status);
+                wait_enter();
+            }
+        }
+        while (job_status != STATUS_OKAY) {
+            clear_terminal();
+            printf("Pick a class:\n1| %s\n2| %s\n3| %s\n4| %s\n5| %s\n6| %s\n",
+                   get_job_string(0), get_job_string(1), get_job_string(2),
+                   get_job_string(3), get_job_string(4), get_job_string(5));
+            job_status = clean_input(job, sizeof(job));
+            if (job_status == STATUS_OKAY) {
+                job_id = atoi(job) - 1;
+                if (job_id < JOB_COUNT && job_id >= 0) {
+                    party[index].job = job_id;
+                    party[index].stats = stats_table[job_id];
+                } else {
+                    job_status = STATUS_INVALID_INPUT;
+                    read_status(job_status);
+                    wait_enter();
+                }
+            } else {
+                read_status(job_status);
+                wait_enter();
+            }
+        }
+        (*party_size)++;
+        clear_terminal();
+        printf(
+            "%s added\n\nJob: %s\n\nStrength: %u\nAgility: %u\nIntelligence: "
+            "%u\nStamina: %u\nResilience: %u\nSpirit: %u\n",
+            name, get_job_string(job_id), party[index].stats.strength,
+            party[index].stats.agility, party[index].stats.intelligence,
+            party[index].stats.stamina, party[index].stats.resilience,
+            party[index].stats.spirit);
+        wait_enter();
+    } else {
+        input_status = STATUS_LIST_FULL;
+        read_status(input_status);
+        wait_enter();
+    }
+}
+
 int main(void) {
-    struct character party[4];
+    struct character party[MAX_PARTY_SIZE];
     size_t party_size = 0;
     static bool running = true;
     while (running) {
-        enum menu_option user_input = render_menu();
-        delay(DELAY_MENU);
+        enum menu_option user_input = render_menu(party_size);
         switch (user_input) {
             case MENU_ADD:
                 printf("MENU_ADD\n");
+                add_character(party, &party_size);
                 break;
             case MENU_VIEW:
                 printf("MENU_VIEW\n");
@@ -225,9 +300,9 @@ int main(void) {
                 running = false;
                 break;
             default:
-                printf("Undefined Behavior\n");
+                printf("Undefined\n");
                 return 1;
         }
     }
-        return 0;
+    return 0;
 }
