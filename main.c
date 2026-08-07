@@ -134,12 +134,14 @@ static const char *get_job_string(const enum job job_id) {
     }
 }
 
+// Bad implementation of delay that doesn't require specific system headers
 void delay(const int milliseconds) {
     clock_t start = clock();
     while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
         ;
 }
 
+// Cleans user input and will return status
 int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
     if (fgets(string, string_size, stdin) == NULL) {
@@ -159,6 +161,7 @@ int clean_input(char string[], const size_t string_size) {
     return STATUS_OKAY;
 }
 
+// Print user error messages
 void read_status(enum status status_id) {
     switch (status_id) {
         case STATUS_NULL_INPUT:
@@ -181,27 +184,21 @@ void read_status(enum status status_id) {
     }
 }
 
+// Render the main menu and return valid user input
 enum menu_option render_menu() {
     while (true) {
-        clear_terminal();
         printf("1| Add\n2| View\n3| Change\n4| Quit\n");
         char input[2];
         enum status input_result = clean_input(input, sizeof(input));
         if (input_result == STATUS_OKAY) {
-            clear_terminal();
-            printf("string: %s\n", input);
-            delay(DELAY_MENU);
             enum menu_option user_input = atoi(input) - 1;
-            if (user_input < MENU_COUNT && user_input > 0) {
+            if (user_input < MENU_COUNT && user_input >= 0) {
                 return user_input;
             } else {
                 read_status(STATUS_INVALID_INPUT);
-                delay(DELAY_MENU);
             }
         } else {
-            clear_terminal();
             read_status(input_result);
-            delay(DELAY_MENU);
         }
     }
 }
@@ -212,26 +209,25 @@ int main(void) {
     static bool running = true;
     while (running) {
         enum menu_option user_input = render_menu();
-        printf("Integer is: %d\n", user_input);
-        printf("%d is MENU_ADD", MENU_ADD);
         delay(DELAY_MENU);
         switch (user_input) {
             case MENU_ADD:
-                printf("MENU_ADD");
+                printf("MENU_ADD\n");
                 break;
             case MENU_VIEW:
-                printf("MENU_VIEW");
+                printf("MENU_VIEW\n");
                 break;
             case MENU_CHANGE:
-                printf("MENU_CHANGE");
+                printf("MENU_CHANGE\n");
                 break;
             case MENU_QUIT:
+                printf("MENU_QUIT\n");
                 running = false;
                 break;
             default:
-                printf("Undefined Behavior");
+                printf("Undefined Behavior\n");
                 return 1;
         }
-        return 0;
     }
+        return 0;
 }
