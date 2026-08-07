@@ -15,19 +15,17 @@ void clear_terminal() {
 #endif
 }
 
-static bool running = true;
-
 enum {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
     MAX_ITEM_COUNT = 255,
-    MAX_JOB_COUNT = 6
+    DELAY_MENU = 1000
 };
 
-enum menu_option { MENU_ADD, MENU_VIEW, MENU_CHANGE, MENU_QUIT = 0 };
+enum menu_option { MENU_ADD, MENU_VIEW, MENU_CHANGE, MENU_QUIT, MENU_COUNT };
 
 enum status {
-    STATUS_OKAY = 0,
+    STATUS_OKAY,
     STATUS_NOT_FOUND,
     STATUS_INVALID_INPUT,
     STATUS_NULL_INPUT,
@@ -41,7 +39,8 @@ enum job {
     JOB_MAGE,
     JOB_ROGUE,
     JOB_PALADIN,
-    JOB_ASSASSIN
+    JOB_ASSASSIN,
+    JOB_COUNT
 };
 
 enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
@@ -55,7 +54,7 @@ struct stats {
     uint8_t spirit;
 };
 
-struct stats stats_table[MAX_JOB_COUNT] = {
+struct stats stats_table[JOB_COUNT] = {
     [JOB_FIGHTER] = {.strength = 20,
                      .agility = 10,
                      .intelligence = 5,
@@ -173,26 +172,38 @@ void read_status(enum status status_id) {
             break;
         case STATUS_OKAY:
             break;
-        default:
-            printf("CRITICAL ERROR\n");
+        case STATUS_INVALID_INPUT:
+            printf("Invalid Input\n");
             break;
+        case STATUS_LIST_FULL:
+            printf("List Full\n");
+            break;
+        case STATUS_NOT_FOUND:
+            printf("Not found\n");
     }
 }
 
-void render_menu() {
-    while (running) {
+enum menu_option render_menu() {
+    while (true) {
         clear_terminal();
         printf("1| Add\n2| View\n3| Change\n4| Quit\n");
         char input[2];
-        enum status result = clean_input(input, sizeof(input));
-        if (result == 0) {
+        enum status input_result = clean_input(input, sizeof(input));
+        if (input_result == STATUS_OKAY) {
             clear_terminal();
-            printf("%s", input);
-            delay(1000);
+            printf("string: %s\n", input);
+            delay(DELAY_MENU);
+            enum menu_option user_input = atoi(input);
+            if (user_input <= MENU_COUNT && user_input > 0) {
+                return user_input;
+            } else {
+                read_status(STATUS_INVALID_INPUT);
+                delay(DELAY_MENU);
+            }
         } else {
             clear_terminal();
-            read_status(result);
-            delay(1000);
+            read_status(input_result);
+            delay(DELAY_MENU);
         }
     }
 }
@@ -200,9 +211,12 @@ void render_menu() {
 int main(void) {
     struct character party[4];
     size_t party_size = 0;
+    static bool running = true;
 
     while (running) {
-        render_menu();
+        enum menu_option user_input = render_menu();
+        printf("Integer is: %d\n", user_input);
+        delay(DELAY_MENU);
     }
 
     return 0;
