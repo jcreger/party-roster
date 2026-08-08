@@ -381,21 +381,16 @@ int main(void) {
         enum menu_option user_input = render_menu(party_size);
         switch (user_input) {
             case MENU_ADD:
-                printf("MENU_ADD\n");
                 add_character(party, &party_size);
                 break;
             case MENU_VIEW:
-                printf("MENU_VIEW\n");
                 break;
             case MENU_CHANGE:
-                printf("MENU_CHANGE\n");
                 break;
             case MENU_QUIT:
-                printf("MENU_QUIT\n");
                 running = false;
                 break;
             case MENU_REMOVE:
-                printf("MENU_REMOVE\n");
                 remove_character(party, &party_size);
                 break;
             default:
