@@ -352,6 +352,18 @@ void add_job(struct character *character) {
     }
 }
 
+void render_party_character(const struct character character) {
+    clear_terminal();
+    printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
+           "\nIntelligence: %" PRIu8 "\nStamina: %" PRIu8
+           "\nResilience: %" PRIu8 "\nSpirit: %" PRIu8 "\n",
+           character.name, get_job_string(character.job),
+           character.stats.strength, character.stats.agility,
+           character.stats.intelligence, character.stats.stamina,
+           character.stats.resilience, character.stats.spirit);
+    wait_enter();
+}
+
 // Creates a new character struct in party
 void add_character(struct character party[], size_t *party_size) {
     int index = *party_size;
@@ -360,15 +372,7 @@ void add_character(struct character party[], size_t *party_size) {
         add_name(&party[index]);
         add_job(&party[index]);
         (*party_size)++;
-        clear_terminal();
-        printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
-               "\nIntelligence: %" PRIu8 "\nStamina: %" PRIu8
-               "\nResilience: %" PRIu8 "\nSpirit: %" PRIu8 "\n",
-               party[index].name, get_job_string(party[index].job),
-               party[index].stats.strength, party[index].stats.agility,
-               party[index].stats.intelligence, party[index].stats.stamina,
-               party[index].stats.resilience, party[index].stats.spirit);
-        wait_enter();
+        render_party_character(party[index]);
     } else {
         read_status(STATUS_LIST_FULL);
     }
@@ -412,17 +416,7 @@ void view_character(const struct character party[], size_t party_size) {
             input_status = clean_input_int(&input, 1);
             if (validate_party_input(&input, input_status, party_size) ==
                 true) {
-                clear_terminal();
-                printf(
-                    "Name: %s\n\nJob: %s\n\nStrength: %" PRIu8
-                    "\nAgility: %" PRIu8 "\nIntelligence: %" PRIu8
-                    "\nStamina: %" PRIu8 "\nResilience: %" PRIu8
-                    "\nSpirit: %" PRIu8 "\n",
-                    party[input].name, get_job_string(party[input].job),
-                    party[input].stats.strength, party[input].stats.agility,
-                    party[input].stats.intelligence, party[input].stats.stamina,
-                    party[input].stats.resilience, party[input].stats.spirit);
-                wait_enter();
+                render_party_character(party[input]);
             }
             if ((size_t)input == party_size) {
                 return;
@@ -433,16 +427,23 @@ void view_character(const struct character party[], size_t party_size) {
     }
 }
 
-void change_job(struct character *party[], const size_t party_size) {
+void change_job(struct character party[], const size_t party_size) {
     int input;
     enum status input_status;
 
     if (party_size > 0) {
-        render_party(*party, party_size);
-        input_status = clean_input_int(&input, 1);
-        if (validate_party_input(&input, input_status, party_size) == true) {
+        while (true) {
+            render_party(party, party_size);
+            input_status = clean_input_int(&input, 1);
+            if (validate_party_input(&input, input_status, party_size) ==
+                true) {
+                add_job(&party[input]);
+                render_party_character(party[input]);
+            }
+            if ((size_t)input == party_size) {
+                return;
+            }
         }
-
     } else {
         read_status(STATUS_EMPTY);
     }
@@ -462,6 +463,7 @@ int main(void) {
                 view_character(party, party_size);
                 break;
             case MENU_CHANGE:
+                change_job(party, party_size);
                 break;
             case MENU_QUIT:
                 running = false;
