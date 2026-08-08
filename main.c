@@ -336,21 +336,36 @@ void add_character(struct character party[], size_t *party_size) {
     }
 }
 
-void remove_character(struct character party[], size_t party_size) {
+void remove_character(struct character party[], size_t *party_size) {
     enum status input_status;
     int input;
 
     clear_terminal();
-    if (party_size > 0) {
-        for (size_t i = 0; i < party_size; i++) {
-            printf("%zu| %s\n", i + 1, party[i].name);
-        }
-        printf("Remove: ");
-        input_status = clean_input_int(&input, 1);
-        if (input_status == STATUS_OKAY) {
-
-        } else {
-            read_status(input_status);
+    if (*party_size > 0) {
+        while (true) {
+            for (size_t i = 0; i < *party_size; i++) {
+                printf("%zu| %s\n", i + 1, party[i].name);
+            }
+            printf("\n%zu| Quit\n\n", *party_size + 1);
+            printf("Remove: ");
+            input_status = clean_input_int(&input, 1);
+            if (input_status == STATUS_OKAY) {
+                input--;
+                if ((size_t)input <= *party_size && input >= 0) {
+                    if ((size_t)input == *party_size) {
+                        return;
+                    }
+                    for (size_t i = input; i < *party_size - 1; i++) {
+                        party[i] = party[i + 1];
+                    }
+                    (*party_size)--;
+                } else {
+                    input_status = STATUS_INVALID_OPTION;
+                    read_status(input_status);
+                }
+            } else {
+                read_status(input_status);
+            }
         }
     } else {
         input_status = STATUS_EMPTY;
@@ -381,7 +396,7 @@ int main(void) {
                 break;
             case MENU_REMOVE:
                 printf("MENU_REMOVE\n");
-                remove_character(party, party_size);
+                remove_character(party, &party_size);
                 break;
             default:
                 printf("Undefined\n");
