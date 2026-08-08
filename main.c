@@ -266,6 +266,7 @@ enum menu_option render_menu(const size_t party_size) {
         for (int i = 0; i < MENU_COUNT; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
+        printf("\n> ");
         input_status = clean_input_int(&input, 1);
         if (input_status == STATUS_OKAY) {
             input--;
@@ -304,6 +305,7 @@ void add_character(struct character party[], size_t *party_size) {
             for (int i = 0; i < JOB_COUNT; i++) {
                 printf("%d| %s\n", i + 1, get_job_string(i));
             }
+            printf("\n> ");
             job_status = clean_input_int(&job_id, 1);
             if (job_status == STATUS_OKAY) {
                 job_id--;
@@ -343,7 +345,7 @@ void remove_character(struct character party[], size_t *party_size) {
                 printf("%zu| %s\n", i + 1, party[i].name);
             }
             printf("\n%zu| Quit\n\n", *party_size + 1);
-            printf("Remove: ");
+            printf("> ");
             input_status = clean_input_int(&input, 1);
             if (input_status == STATUS_OKAY) {
                 input--;
@@ -355,6 +357,10 @@ void remove_character(struct character party[], size_t *party_size) {
                         party[i] = party[i + 1];
                     }
                     (*party_size)--;
+                    clear_terminal();
+                    if (*party_size == 0) {
+                        return;
+                    }
                 } else {
                     input_status = STATUS_INVALID_OPTION;
                     read_status(input_status);
@@ -368,6 +374,7 @@ void remove_character(struct character party[], size_t *party_size) {
     }
 }
 
+// Opens menu to select invididual characters and view their name, job, stats
 void view_character(const struct character party[], size_t party_size) {
     int input;
 
@@ -376,7 +383,8 @@ void view_character(const struct character party[], size_t party_size) {
         for (size_t i = 0; i < party_size; i++) {
             printf("%zu| %s\n", i + 1, party[i].name);
         }
-        printf("\n\n%zu|Quit\n\n", party_size + 1);
+        printf("\n\n%zu| Quit\n\n", party_size + 1);
+        printf("> ");
         enum status input_status = clean_input_int(&input, 1);
         if (input_status == STATUS_OKAY) {
             input--;
@@ -432,5 +440,6 @@ int main(void) {
                 return 1;
         }
     }
+    clear_terminal();
     return 0;
 }
