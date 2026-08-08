@@ -18,7 +18,6 @@ void clear_terminal() {
 enum {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
-    INPUT_LENGTH = 2,
     MAX_ITEM_COUNT = 255,
     MAX_PARTY_SIZE = 4,
     DELAY_MENU = 1000
@@ -141,7 +140,7 @@ static const char *get_job_string(const enum job job_id) {
         case JOB_ASSASSIN:
             return "Assassin";
         default:
-            return "Undefined";
+            return "JOB UNDEFINED";
     }
 }
 
@@ -158,7 +157,7 @@ static const char *get_menu_string(const enum menu_option option_id) {
         case MENU_REMOVE:
             return "Remove a character";
         default:
-            return "Undefined";
+            return "MENU UNDEFINED";
     }
 }
 
@@ -218,6 +217,13 @@ enum status clean_input_int(int *num, int digit_count) {
     }
 }
 
+// Waits until user inputs anything to continue
+void wait_enter() {
+    char input;
+    printf("\npress enter to continue...\n");
+    clean_input(&input, sizeof(input));
+}
+
 // Print user error messages
 void read_status(enum status status_id) {
     clear_terminal();
@@ -227,8 +233,6 @@ void read_status(enum status status_id) {
             break;
         case STATUS_LONG_INPUT:
             printf("Input too long\n");
-            break;
-        case STATUS_OKAY:
             break;
         case STATUS_INVALID_INPUT:
             printf("Invalid Input\n");
@@ -245,14 +249,10 @@ void read_status(enum status status_id) {
         case STATUS_INVALID_OPTION:
             printf("Not an option");
             break;
+        default:
+            printf("STATUS UNDEFINED");
     }
-}
-
-// Waits until user inputs anything to continue
-void wait_enter() {
-    char input;
-    printf("\npress enter to continue...\n");
-    clean_input(&input, sizeof(input));
+    wait_enter();
 }
 
 // Render the main menu and return valid user input
@@ -274,11 +274,9 @@ enum menu_option render_menu(const size_t party_size) {
             } else {
                 input_status = STATUS_INVALID_OPTION;
                 read_status(input_status);
-                wait_enter();
             }
         } else {
             read_status(input_status);
-            wait_enter();
         }
     }
 }
@@ -301,7 +299,6 @@ void add_character(struct character party[], size_t *party_size) {
                 strcpy(party[index].name, name);
             } else {
                 read_status(name_status);
-                wait_enter();
             }
         }
         while (job_status != STATUS_OKAY) {
@@ -318,11 +315,9 @@ void add_character(struct character party[], size_t *party_size) {
                 } else {
                     job_status = STATUS_INVALID_OPTION;
                     read_status(job_status);
-                    wait_enter();
                 }
             } else {
                 read_status(job_status);
-                wait_enter();
             }
         }
         (*party_size)++;
@@ -338,18 +333,28 @@ void add_character(struct character party[], size_t *party_size) {
     } else {
         input_status = STATUS_LIST_FULL;
         read_status(input_status);
-        wait_enter();
     }
 }
 
 void remove_character(struct character party[], size_t party_size) {
     enum status input_status;
+    int input;
 
+    clear_terminal();
     if (party_size > 0) {
+        for (size_t i = 0; i < party_size; i++) {
+            printf("%zu| %s\n", i + 1, party[i].name);
+        }
+        printf("Remove: ");
+        input_status = clean_input_int(&input, 1);
+        if (input_status == STATUS_OKAY) {
+
+        } else {
+            read_status(input_status);
+        }
     } else {
         input_status = STATUS_EMPTY;
         read_status(input_status);
-        wait_enter();
     }
 }
 
