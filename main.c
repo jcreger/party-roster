@@ -220,7 +220,7 @@ enum status clean_input_int(int *num, int digit_count) {
 // Waits until user inputs anything to continue
 void wait_enter() {
     char input;
-    printf("\npress enter to continue...\n");
+    printf("\npress enter to continue...\n\n");
     clean_input(&input, sizeof(input));
 }
 
@@ -272,8 +272,7 @@ enum menu_option render_menu(const size_t party_size) {
             if (input < MENU_COUNT && input >= 0) {
                 return input;
             } else {
-                input_status = STATUS_INVALID_OPTION;
-                read_status(input_status);
+                read_status(STATUS_INVALID_OPTION);
             }
         } else {
             read_status(input_status);
@@ -284,7 +283,6 @@ enum menu_option render_menu(const size_t party_size) {
 // Creates a new character struct in party
 void add_character(struct character party[], size_t *party_size) {
     char name[CHARACTER_NAME_LENGTH];
-    enum status input_status;
     enum status name_status;
     enum status job_status;
     int job_id;
@@ -313,8 +311,7 @@ void add_character(struct character party[], size_t *party_size) {
                     party[index].job = job_id;
                     party[index].stats = stats_table[job_id];
                 } else {
-                    job_status = STATUS_INVALID_OPTION;
-                    read_status(job_status);
+                    read_status(STATUS_INVALID_OPTION);
                 }
             } else {
                 read_status(job_status);
@@ -322,17 +319,16 @@ void add_character(struct character party[], size_t *party_size) {
         }
         (*party_size)++;
         clear_terminal();
-        printf(
-            "Name: %s\n\nJob: %s\n\nStrength: %u\nAgility: %u\nIntelligence: "
-            "%u\nStamina: %u\nResilience: %u\nSpirit: %u\n",
-            name, get_job_string(job_id), party[index].stats.strength,
-            party[index].stats.agility, party[index].stats.intelligence,
-            party[index].stats.stamina, party[index].stats.resilience,
-            party[index].stats.spirit);
+        printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
+               "\nIntelligence: %" PRIu8 "\nStamina: %" PRIu8
+               "\nResilience: %" PRIu8 "\nSpirit: %" PRIu8 "\n",
+               party[index].name, get_job_string(party[index].job),
+               party[index].stats.strength, party[index].stats.agility,
+               party[index].stats.intelligence, party[index].stats.stamina,
+               party[index].stats.resilience, party[index].stats.spirit);
         wait_enter();
     } else {
-        input_status = STATUS_LIST_FULL;
-        read_status(input_status);
+        read_status(STATUS_LIST_FULL);
     }
 }
 
@@ -368,8 +364,45 @@ void remove_character(struct character party[], size_t *party_size) {
             }
         }
     } else {
-        input_status = STATUS_EMPTY;
-        read_status(input_status);
+        read_status(STATUS_EMPTY);
+    }
+}
+
+void view_character(const struct character party[], size_t party_size) {
+    int input;
+
+    if (party_size > 0) {
+        clear_terminal();
+        for (size_t i = 0; i < party_size; i++) {
+            printf("%zu| %s\n", i + 1, party[i].name);
+        }
+        printf("\n\n%zu|Quit\n\n", party_size + 1);
+        enum status input_status = clean_input_int(&input, 1);
+        if (input_status == STATUS_OKAY) {
+            input--;
+            if ((size_t)input <= party_size && input >= 0) {
+                if ((size_t)input == party_size) {
+                    return;
+                }
+                clear_terminal();
+                printf(
+                    "Name: %s\n\nJob: %s\n\nStrength: %" PRIu8
+                    "\nAgility: %" PRIu8 "\nIntelligence: %" PRIu8
+                    "\nStamina: %" PRIu8 "\nResilience: %" PRIu8
+                    "\nSpirit: %" PRIu8 "\n",
+                    party[input].name, get_job_string(party[input].job),
+                    party[input].stats.strength, party[input].stats.agility,
+                    party[input].stats.intelligence, party[input].stats.stamina,
+                    party[input].stats.resilience, party[input].stats.spirit);
+                wait_enter();
+            } else {
+                read_status(STATUS_INVALID_OPTION);
+            }
+        } else {
+            read_status(input_status);
+        }
+    } else {
+        read_status(STATUS_EMPTY);
     }
 }
 
@@ -384,6 +417,7 @@ int main(void) {
                 add_character(party, &party_size);
                 break;
             case MENU_VIEW:
+                view_character(party, party_size);
                 break;
             case MENU_CHANGE:
                 break;
