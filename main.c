@@ -151,7 +151,7 @@ static const char *get_menu_string(const enum menu_option option_id) {
         case MENU_VIEW:
             return "View party";
         case MENU_CHANGE:
-            return "Change stats";
+            return "Change job";
         case MENU_QUIT:
             return "Quit";
         case MENU_REMOVE:
@@ -255,6 +255,33 @@ void read_status(enum status status_id) {
     wait_enter();
 }
 
+void render_party(const struct character party[], size_t party_size) {
+    clear_terminal();
+    for (size_t i = 0; i < party_size; i++) {
+        printf("%zu| %s\n", i + 1, party[i].name);
+    }
+    printf("\n\n%zu| Quit\n\n", party_size + 1);
+    printf("> ");
+}
+
+bool validate_party_input(int *input, const enum status input_status,
+                          const size_t party_size) {
+    if (input_status == STATUS_OKAY) {
+        (*input)--;
+        if ((size_t)*input < party_size && *input >= 0) {
+            return true;
+        } else if ((size_t)*input == party_size) {
+            return false;
+        } else {
+            read_status(STATUS_INVALID_INPUT);
+            return false;
+        }
+    } else {
+        read_status(input_status);
+        return false;
+    }
+}
+
 // Render the main menu and return valid user input
 enum menu_option render_menu(const size_t party_size) {
     int input;
@@ -281,44 +308,57 @@ enum menu_option render_menu(const size_t party_size) {
     }
 }
 
-// Creates a new character struct in party
-void add_character(struct character party[], size_t *party_size) {
+void add_name(struct character *character) {
     char name[CHARACTER_NAME_LENGTH];
     enum status name_status;
+
+    while (true) {
+        clear_terminal();
+        printf("Name: ");
+        name_status = clean_input(name, sizeof(name));
+        if (name_status == STATUS_OKAY) {
+            strcpy(character->name, name);
+            return;
+        } else {
+            read_status(name_status);
+        }
+    }
+}
+
+void add_job(struct character *character) {
     enum status job_status;
     int job_id;
+
+    while (true) {
+        clear_terminal();
+        for (int i = 0; i < JOB_COUNT; i++) {
+            printf("%d| %s\n", i + 1, get_job_string(i));
+        }
+        printf("\n> ");
+        job_status = clean_input_int(&job_id, 1);
+        if (job_status == STATUS_OKAY) {
+            job_id--;
+            if (job_id < JOB_COUNT && job_id >= 0) {
+                character->job = job_id;
+                character->stats = stats_table[job_id];
+                return;
+            } else {
+                job_status = STATUS_INVALID_OPTION;
+                read_status(job_status);
+            }
+        } else {
+            read_status(job_status);
+        }
+    }
+}
+
+// Creates a new character struct in party
+void add_character(struct character party[], size_t *party_size) {
     int index = *party_size;
 
     if (*party_size < MAX_PARTY_SIZE) {
-        while (name_status != STATUS_OKAY) {
-            clear_terminal();
-            printf("Name: ");
-            name_status = clean_input(name, sizeof(name));
-            if (name_status == STATUS_OKAY) {
-                strcpy(party[index].name, name);
-            } else {
-                read_status(name_status);
-            }
-        }
-        while (job_status != STATUS_OKAY) {
-            clear_terminal();
-            for (int i = 0; i < JOB_COUNT; i++) {
-                printf("%d| %s\n", i + 1, get_job_string(i));
-            }
-            printf("\n> ");
-            job_status = clean_input_int(&job_id, 1);
-            if (job_status == STATUS_OKAY) {
-                job_id--;
-                if (job_id < JOB_COUNT && job_id >= 0) {
-                    party[index].job = job_id;
-                    party[index].stats = stats_table[job_id];
-                } else {
-                    read_status(STATUS_INVALID_OPTION);
-                }
-            } else {
-                read_status(job_status);
-            }
-        }
+        add_name(&party[index]);
+        add_job(&party[index]);
         (*party_size)++;
         clear_terminal();
         printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
@@ -338,35 +378,21 @@ void remove_character(struct character party[], size_t *party_size) {
     enum status input_status;
     int input;
 
-    clear_terminal();
     if (*party_size > 0) {
         while (true) {
-            for (size_t i = 0; i < *party_size; i++) {
-                printf("%zu| %s\n", i + 1, party[i].name);
-            }
-            printf("\n%zu| Quit\n\n", *party_size + 1);
-            printf("> ");
+            render_party(party, *party_size);
             input_status = clean_input_int(&input, 1);
-            if (input_status == STATUS_OKAY) {
-                input--;
-                if ((size_t)input <= *party_size && input >= 0) {
-                    if ((size_t)input == *party_size) {
-                        return;
-                    }
-                    for (size_t i = input; i < *party_size - 1; i++) {
-                        party[i] = party[i + 1];
-                    }
-                    (*party_size)--;
-                    clear_terminal();
-                    if (*party_size == 0) {
-                        return;
-                    }
-                } else {
-                    input_status = STATUS_INVALID_OPTION;
-                    read_status(input_status);
+            if (validate_party_input(&input, input_status, *party_size) ==
+                true) {
+                for (size_t i = input; i < *party_size - 1; i++) {
+                    party[i] = party[i + 1];
                 }
-            } else {
-                read_status(input_status);
+                (*party_size)--;
+                if (*party_size == 0) {
+                    return;
+                }
+            } else if ((size_t)input == *party_size) {
+                return;
             }
         }
     } else {
@@ -374,24 +400,18 @@ void remove_character(struct character party[], size_t *party_size) {
     }
 }
 
-// Opens menu to select invididual characters and view their name, job, stats
+// Opens menu to select invididual characters and view their name, job,
+// stats
 void view_character(const struct character party[], size_t party_size) {
     int input;
+    enum status input_status;
 
     if (party_size > 0) {
-        clear_terminal();
-        for (size_t i = 0; i < party_size; i++) {
-            printf("%zu| %s\n", i + 1, party[i].name);
-        }
-        printf("\n\n%zu| Quit\n\n", party_size + 1);
-        printf("> ");
-        enum status input_status = clean_input_int(&input, 1);
-        if (input_status == STATUS_OKAY) {
-            input--;
-            if ((size_t)input <= party_size && input >= 0) {
-                if ((size_t)input == party_size) {
-                    return;
-                }
+        while (true) {
+            render_party(party, party_size);
+            input_status = clean_input_int(&input, 1);
+            if (validate_party_input(&input, input_status, party_size) ==
+                true) {
                 clear_terminal();
                 printf(
                     "Name: %s\n\nJob: %s\n\nStrength: %" PRIu8
@@ -403,12 +423,26 @@ void view_character(const struct character party[], size_t party_size) {
                     party[input].stats.intelligence, party[input].stats.stamina,
                     party[input].stats.resilience, party[input].stats.spirit);
                 wait_enter();
-            } else {
-                read_status(STATUS_INVALID_OPTION);
             }
-        } else {
-            read_status(input_status);
+            if ((size_t)input == party_size) {
+                return;
+            }
         }
+    } else {
+        read_status(STATUS_EMPTY);
+    }
+}
+
+void change_job(struct character *party[], const size_t party_size) {
+    int input;
+    enum status input_status;
+
+    if (party_size > 0) {
+        render_party(*party, party_size);
+        input_status = clean_input_int(&input, 1);
+        if (validate_party_input(&input, input_status, party_size) == true) {
+        }
+
     } else {
         read_status(STATUS_EMPTY);
     }
