@@ -27,6 +27,7 @@ enum menu_option {
     MENU_VIEW,
     MENU_CHANGE,
     MENU_REMOVE,
+    MENU_SORT,
     MENU_QUIT,
     MENU_COUNT
 };
@@ -142,37 +143,43 @@ void array_swap(struct character *a, struct character *b) {
 
 void array_sort_stats(struct character party[], size_t array_size,
                       enum stat stat) {
-    for (size_t i = 0; i < array_size - 1; i++) {
+    for (size_t i = 0; i < array_size; i++) {
         bool swapped = false;
         for (size_t j = 0; j < array_size - i - 1; j++) {
             uint8_t a, b;
             switch (stat) {
-                case STAT_STRENGTH:
-                    a = party[j].stats.strength;
-                    b = party[j + 1].stats.strength;
-                case STAT_AGILITY:
-                    a = party[j].stats.agility;
-                    b = party[j + 1].stats.agility;
-                case STAT_INTELLIGENCE:
-                    a = party[j].stats.intelligence;
-                    b = party[j + 1].stats.intelligence;
-                case STAT_STAMINA:
-                    a = party[j].stats.stamina;
-                    b = party[j + 1].stats.stamina;
-                case STAT_RESILIENCE:
-                    a = party[j].stats.resilience;
-                    b = party[j + 1].stats.resilience;
-                case STAT_SPIRIT:
-                    a = party[j].stats.spirit;
-                    b = party[j + 1].stats.spirit;
+            case STAT_STRENGTH:
+                a = party[j].stats.strength;
+                b = party[j + 1].stats.strength;
+                break;
+            case STAT_AGILITY:
+                a = party[j].stats.agility;
+                b = party[j + 1].stats.agility;
+                break;
+            case STAT_INTELLIGENCE:
+                a = party[j].stats.intelligence;
+                b = party[j + 1].stats.intelligence;
+                break;
+            case STAT_STAMINA:
+                a = party[j].stats.stamina;
+                b = party[j + 1].stats.stamina;
+                break;
+            case STAT_RESILIENCE:
+                a = party[j].stats.resilience;
+                b = party[j + 1].stats.resilience;
+                break;
+            case STAT_SPIRIT:
+                a = party[j].stats.spirit;
+                b = party[j + 1].stats.spirit;
+                break;
             }
             if (a > b) {
                 array_swap(&party[j], &party[j + 1]);
                 swapped = true;
             }
-            if (!swapped) {
-                return;
-            }
+        }
+        if (!swapped) {
+            return;
         }
     }
 }
@@ -180,38 +187,42 @@ void array_sort_stats(struct character party[], size_t array_size,
 // Returns a string literal for the given job's display name
 static const char *get_job_string(const enum job job_id) {
     switch (job_id) {
-        case JOB_FIGHTER:
-            return "Fighter";
-        case JOB_THIEF:
-            return "Thief";
-        case JOB_MAGE:
-            return "Mage";
-        case JOB_ROGUE:
-            return "Rogue";
-        case JOB_PALADIN:
-            return "Paladin";
-        case JOB_ASSASSIN:
-            return "Assassin";
-        default:
-            return "JOB UNDEFINED";
+    case JOB_FIGHTER:
+        return "Fighter";
+    case JOB_THIEF:
+        return "Thief";
+    case JOB_MAGE:
+        return "Mage";
+    case JOB_ROGUE:
+        return "Rogue";
+    case JOB_PALADIN:
+        return "Paladin";
+    case JOB_ASSASSIN:
+        return "Assassin";
+    case JOB_COUNT:
+        return "JOB UNDEFINED";
     }
+    return "JOB UNDEFINED";
 }
 
 static const char *get_menu_string(const enum menu_option option_id) {
     switch (option_id) {
-        case MENU_ADD:
-            return "Add a character";
-        case MENU_VIEW:
-            return "View party";
-        case MENU_CHANGE:
-            return "Change job";
-        case MENU_QUIT:
-            return "Quit";
-        case MENU_REMOVE:
-            return "Remove a character";
-        default:
-            return "MENU UNDEFINED";
+    case MENU_ADD:
+        return "Add a character";
+    case MENU_VIEW:
+        return "View party";
+    case MENU_CHANGE:
+        return "Change job";
+    case MENU_QUIT:
+        return "Quit";
+    case MENU_REMOVE:
+        return "Remove a character";
+    case MENU_SORT:
+        return "Sort characters";
+    case MENU_COUNT:
+        return "MENU UNDEFINED";
     }
+    return "MENU UNDEFINED";
 }
 
 // Bad implementation of delay that doesn't require specific system headers
@@ -287,29 +298,30 @@ void wait_enter() {
 void read_status(enum status status_id) {
     clear_terminal();
     switch (status_id) {
-        case STATUS_NULL_INPUT:
-            printf("You cannot input NULL\n");
-            break;
-        case STATUS_LONG_INPUT:
-            printf("Input too long\n");
-            break;
-        case STATUS_INVALID_INPUT:
-            printf("Invalid Input\n");
-            break;
-        case STATUS_LIST_FULL:
-            printf("List Full\n");
-            break;
-        case STATUS_NOT_FOUND:
-            printf("Not found\n");
-            break;
-        case STATUS_EMPTY:
-            printf("Party is empty\n");
-            break;
-        case STATUS_INVALID_OPTION:
-            printf("Not an option");
-            break;
-        default:
-            printf("STATUS UNDEFINED");
+    case STATUS_NULL_INPUT:
+        printf("You cannot input NULL\n");
+        break;
+    case STATUS_LONG_INPUT:
+        printf("Input too long\n");
+        break;
+    case STATUS_INVALID_INPUT:
+        printf("Invalid Input\n");
+        break;
+    case STATUS_LIST_FULL:
+        printf("List Full\n");
+        break;
+    case STATUS_NOT_FOUND:
+        printf("Not found\n");
+        break;
+    case STATUS_EMPTY:
+        printf("Party is empty\n");
+        break;
+    case STATUS_INVALID_OPTION:
+        printf("Not an option");
+        break;
+    case STATUS_OKAY:
+        printf("Ok");
+        break;
     }
     wait_enter();
 }
@@ -340,7 +352,7 @@ enum selection validate_party_input(int *input, const enum status input_status,
         }
     } else {
         read_status(input_status);
-        return false;
+        return SELECTION_INVALID;
     }
 }
 
@@ -450,19 +462,19 @@ void remove_character(struct character party[], size_t *party_size) {
             render_quit(*party_size);
             input_status = clean_input_int(&input, 1);
             switch (validate_party_input(&input, input_status, *party_size)) {
-                case SELECTION_VALID:
-                    for (size_t i = input; i < *party_size - 1; i++) {
-                        party[i] = party[i + 1];
-                    }
-                    (*party_size)--;
-                    if (*party_size == 0) {
-                        return;
-                    }
-                    break;
-                case SELECTION_QUIT:
+            case SELECTION_VALID:
+                for (size_t i = input; i < *party_size - 1; i++) {
+                    party[i] = party[i + 1];
+                }
+                (*party_size)--;
+                if (*party_size == 0) {
                     return;
-                case SELECTION_INVALID:
-                    break;
+                }
+                break;
+            case SELECTION_QUIT:
+                return;
+            case SELECTION_INVALID:
+                break;
             }
         }
     } else {
@@ -482,13 +494,13 @@ void view_character(const struct character party[], size_t party_size) {
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
             switch (validate_party_input(&input, input_status, party_size)) {
-                case SELECTION_VALID:
-                    render_party_character(party[input]);
-                    break;
-                case SELECTION_QUIT:
-                    return;
-                case SELECTION_INVALID:
-                    break;
+            case SELECTION_VALID:
+                render_party_character(party[input]);
+                break;
+            case SELECTION_QUIT:
+                return;
+            case SELECTION_INVALID:
+                break;
             }
         }
     } else {
@@ -506,14 +518,14 @@ void change_job(struct character party[], const size_t party_size) {
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
             switch (validate_party_input(&input, input_status, party_size)) {
-                case SELECTION_VALID:
-                    add_job(&party[input]);
-                    render_party_character(party[input]);
-                    break;
-                case SELECTION_QUIT:
-                    return;
-                case SELECTION_INVALID:
-                    break;
+            case SELECTION_VALID:
+                add_job(&party[input]);
+                render_party_character(party[input]);
+                break;
+            case SELECTION_QUIT:
+                return;
+            case SELECTION_INVALID:
+                break;
             }
         }
     } else {
@@ -528,24 +540,27 @@ int main(void) {
     while (running) {
         enum menu_option user_input = render_menu(party_size);
         switch (user_input) {
-            case MENU_ADD:
-                add_character(party, &party_size);
-                break;
-            case MENU_VIEW:
-                view_character(party, party_size);
-                break;
-            case MENU_CHANGE:
-                change_job(party, party_size);
-                break;
-            case MENU_QUIT:
-                running = false;
-                break;
-            case MENU_REMOVE:
-                remove_character(party, &party_size);
-                break;
-            default:
-                printf("Undefined\n");
-                return 1;
+        case MENU_ADD:
+            add_character(party, &party_size);
+            break;
+        case MENU_VIEW:
+            view_character(party, party_size);
+            break;
+        case MENU_CHANGE:
+            change_job(party, party_size);
+            break;
+        case MENU_QUIT:
+            running = false;
+            break;
+        case MENU_REMOVE:
+            remove_character(party, &party_size);
+            break;
+        case MENU_SORT:
+            array_sort_stats(party, party_size, STAT_STRENGTH);
+            break;
+        default:
+            printf("MENU FUCKED\n");
+            return 1;
         }
     }
     clear_terminal();
