@@ -225,13 +225,6 @@ static const char *get_menu_string(const enum menu_option option_id) {
     return "MENU UNDEFINED";
 }
 
-// Bad implementation of delay that doesn't require specific system headers
-void delay(const int milliseconds) {
-    clock_t start = clock();
-    while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
-        ;
-}
-
 // Cleans user input and will return status
 int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
