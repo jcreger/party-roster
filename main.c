@@ -15,12 +15,11 @@ void clear_terminal() {
 #endif
 }
 
-enum {
+enum arr_len {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
     MAX_ITEM_COUNT = 255,
     MAX_PARTY_SIZE = 4,
-    DELAY_MENU = 1000
 };
 
 enum menu_option {
@@ -52,6 +51,8 @@ enum job {
     JOB_ASSASSIN,
     JOB_COUNT
 };
+
+enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
 
 enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
 
@@ -208,7 +209,7 @@ enum status clean_input_int(int *num, int digit_count) {
             memset(string, '\0', string_size);
             return STATUS_LONG_INPUT;
         }
-        if (string[0] == '0') {
+        if (sizeof(string) == 2 && string[0] == '0' && string[1] == '\0') {
             *num = atoi(string);
             return STATUS_OKAY;
         }
@@ -273,17 +274,17 @@ void render_quit(const size_t party_size) {
     printf("> ");
 }
 
-bool validate_party_input(int *input, const enum status input_status,
-                          const size_t party_size) {
+enum selection validate_party_input(int *input, const enum status input_status,
+                                    const size_t party_size) {
     if (input_status == STATUS_OKAY) {
         (*input)--;
         if ((size_t)*input < party_size && *input >= 0) {
-            return true;
+            return SELECTION_VALID;
         } else if ((size_t)*input == party_size) {
-            return false;
+            return SELECTION_QUIT;
         } else {
             read_status(STATUS_INVALID_INPUT);
-            return false;
+            return SELECTION_INVALID;
         }
     } else {
         read_status(input_status);
@@ -396,17 +397,20 @@ void remove_character(struct character party[], size_t *party_size) {
             render_party(party, *party_size);
             render_quit(*party_size);
             input_status = clean_input_int(&input, 1);
-            if (validate_party_input(&input, input_status, *party_size) ==
-                true) {
-                for (size_t i = input; i < *party_size - 1; i++) {
-                    party[i] = party[i + 1];
-                }
-                (*party_size)--;
-                if (*party_size == 0) {
+            switch (validate_party_input(&input, input_status, *party_size)) {
+                case SELECTION_VALID:
+                    for (size_t i = input; i < *party_size - 1; i++) {
+                        party[i] = party[i + 1];
+                    }
+                    (*party_size)--;
+                    if (*party_size == 0) {
+                        return;
+                    }
+                    break;
+                case SELECTION_QUIT:
                     return;
-                }
-            } else if ((size_t)input == *party_size) {
-                return;
+                case SELECTION_INVALID:
+                    break;
             }
         }
     } else {
@@ -425,12 +429,14 @@ void view_character(const struct character party[], size_t party_size) {
             render_party(party, party_size);
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
-            if (validate_party_input(&input, input_status, party_size) ==
-                true) {
-                render_party_character(party[input]);
-            }
-            if ((size_t)input == party_size) {
-                return;
+            switch (validate_party_input(&input, input_status, party_size)) {
+                case SELECTION_VALID:
+                    render_party_character(party[input]);
+                    break;
+                case SELECTION_QUIT:
+                    return;
+                case SELECTION_INVALID:
+                    break;
             }
         }
     } else {
@@ -447,13 +453,15 @@ void change_job(struct character party[], const size_t party_size) {
             render_party(party, party_size);
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
-            if (validate_party_input(&input, input_status, party_size) ==
-                true) {
-                add_job(&party[input]);
-                render_party_character(party[input]);
-            }
-            if ((size_t)input == party_size) {
-                return;
+            switch (validate_party_input(&input, input_status, party_size)) {
+                case SELECTION_VALID:
+                    add_job(&party[input]);
+                    render_party_character(party[input]);
+                    break;
+                case SELECTION_QUIT:
+                    return;
+                case SELECTION_INVALID:
+                    break;
             }
         }
     } else {
