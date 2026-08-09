@@ -56,6 +56,15 @@ enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
 
 enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
 
+enum stat {
+    STAT_STRENGTH,
+    STAT_AGILITY,
+    STAT_INTELLIGENCE,
+    STAT_STAMINA,
+    STAT_RESILIENCE,
+    STAT_SPIRIT
+};
+
 struct stats {
     uint8_t strength;
     uint8_t agility;
@@ -124,6 +133,49 @@ struct character {
     struct item_instance inventory[50];
     size_t inventory_size;
 };
+
+void array_swap(struct character *a, struct character *b) {
+    struct character temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void array_sort_stats(struct character party[], size_t array_size,
+                      enum stat stat) {
+    for (size_t i = 0; i < array_size - 1; i++) {
+        bool swapped = false;
+        for (size_t j = 0; j < array_size - i - 1; j++) {
+            uint8_t a, b;
+            switch (stat) {
+                case STAT_STRENGTH:
+                    a = party[j].stats.strength;
+                    b = party[j + 1].stats.strength;
+                case STAT_AGILITY:
+                    a = party[j].stats.agility;
+                    b = party[j + 1].stats.agility;
+                case STAT_INTELLIGENCE:
+                    a = party[j].stats.intelligence;
+                    b = party[j + 1].stats.intelligence;
+                case STAT_STAMINA:
+                    a = party[j].stats.stamina;
+                    b = party[j + 1].stats.stamina;
+                case STAT_RESILIENCE:
+                    a = party[j].stats.resilience;
+                    b = party[j + 1].stats.resilience;
+                case STAT_SPIRIT:
+                    a = party[j].stats.spirit;
+                    b = party[j + 1].stats.spirit;
+            }
+            if (a > b) {
+                array_swap(&party[j], &party[j + 1]);
+                swapped = true;
+            }
+            if (!swapped) {
+                return;
+            }
+        }
+    }
+}
 
 // Returns a string literal for the given job's display name
 static const char *get_job_string(const enum job job_id) {
