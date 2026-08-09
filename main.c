@@ -195,6 +195,8 @@ int clean_input(char string[], const size_t string_size) {
 enum status clean_input_int(int *num, int digit_count) {
     char string[digit_count + 1];
     size_t string_size = sizeof(string);
+    *num = 0;
+
     if (fgets(string, string_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
     }
@@ -205,6 +207,10 @@ enum status clean_input_int(int *num, int digit_count) {
                 ;
             memset(string, '\0', string_size);
             return STATUS_LONG_INPUT;
+        }
+        if (string[0] == '0') {
+            *num = atoi(string);
+            return STATUS_OKAY;
         }
         if (atoi(string) != 0) {
             *num = atoi(string);
@@ -260,6 +266,9 @@ void render_party(const struct character party[], size_t party_size) {
     for (size_t i = 0; i < party_size; i++) {
         printf("%zu| %s\n", i + 1, party[i].name);
     }
+}
+
+void render_quit(const size_t party_size) {
     printf("\n\n%zu| Quit\n\n", party_size + 1);
     printf("> ");
 }
@@ -385,6 +394,7 @@ void remove_character(struct character party[], size_t *party_size) {
     if (*party_size > 0) {
         while (true) {
             render_party(party, *party_size);
+            render_quit(*party_size);
             input_status = clean_input_int(&input, 1);
             if (validate_party_input(&input, input_status, *party_size) ==
                 true) {
@@ -413,6 +423,7 @@ void view_character(const struct character party[], size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
+            render_quit(party_size);
             input_status = clean_input_int(&input, 1);
             if (validate_party_input(&input, input_status, party_size) ==
                 true) {
@@ -434,6 +445,7 @@ void change_job(struct character party[], const size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
+            render_quit(party_size);
             input_status = clean_input_int(&input, 1);
             if (validate_party_input(&input, input_status, party_size) ==
                 true) {
