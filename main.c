@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+#include <strings.h>
+#endif
 
 void clear_terminal() {
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
@@ -12,6 +15,15 @@ void clear_terminal() {
 #endif
 #if defined(_WIN32) || defined(_WIN64)
     system("cls");
+#endif
+}
+
+int string_case_compare(char str1[], char str2[]) {
+#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+    return strcasecmp(str1, str2);
+#endif
+#if defined(_WIN32) || defined(_WIN64)
+    return _stricmp(str1, str2);
 #endif
 }
 
@@ -57,14 +69,17 @@ enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
 
 enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
 
-enum stat {
-    STAT_STRENGTH,
-    STAT_AGILITY,
-    STAT_INTELLIGENCE,
-    STAT_STAMINA,
-    STAT_RESILIENCE,
-    STAT_SPIRIT
+enum sort {
+    SORT_NAME,
+    SORT_STRENGTH,
+    SORT_AGILITY,
+    SORT_INTELLIGENCE,
+    SORT_STAMINA,
+    SORT_RESILIENCE,
+    SORT_SPIRIT
 };
+
+enum order { ORDER_ASCENDING, ORDER_DESCENDING };
 
 struct stats {
     uint8_t strength;
@@ -135,47 +150,79 @@ struct character {
     size_t inventory_size;
 };
 
-void array_swap(struct character *a, struct character *b) {
+void struct_swap(struct character *a, struct character *b) {
     struct character temp = *a;
     *a = *b;
     *b = temp;
 }
 
 void array_sort_stats(struct character party[], size_t array_size,
-                      enum stat stat) {
+                      enum sort sort_id, enum order order_id) {
     for (size_t i = 0; i < array_size; i++) {
         bool swapped = false;
         for (size_t j = 0; j < array_size - i - 1; j++) {
             uint8_t a, b;
-            switch (stat) {
-            case STAT_STRENGTH:
+            char str1[CHARACTER_NAME_LENGTH], str2[CHARACTER_NAME_LENGTH];
+            switch (sort_id) {
+            case SORT_STRENGTH:
                 a = party[j].stats.strength;
                 b = party[j + 1].stats.strength;
                 break;
-            case STAT_AGILITY:
+            case SORT_AGILITY:
                 a = party[j].stats.agility;
                 b = party[j + 1].stats.agility;
                 break;
-            case STAT_INTELLIGENCE:
+            case SORT_INTELLIGENCE:
                 a = party[j].stats.intelligence;
                 b = party[j + 1].stats.intelligence;
                 break;
-            case STAT_STAMINA:
+            case SORT_STAMINA:
                 a = party[j].stats.stamina;
                 b = party[j + 1].stats.stamina;
                 break;
-            case STAT_RESILIENCE:
+            case SORT_RESILIENCE:
                 a = party[j].stats.resilience;
                 b = party[j + 1].stats.resilience;
                 break;
-            case STAT_SPIRIT:
+            case SORT_SPIRIT:
                 a = party[j].stats.spirit;
                 b = party[j + 1].stats.spirit;
                 break;
+            case SORT_NAME:
+                strcpy(str1, party[j].name);
+                strcpy(str2, party[j + 1].name);
+                break;
             }
-            if (a > b) {
-                array_swap(&party[j], &party[j + 1]);
-                swapped = true;
+            if (sort_id != SORT_NAME) {
+                switch (order_id) {
+                case ORDER_ASCENDING:
+                    if (a > b) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_DESCENDING:
+                    if (a < b) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                }
+            } else {
+                switch (order_id) {
+                case ORDER_ASCENDING:
+                    if (string_case_compare(str1, str2) > 0) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_DESCENDING:
+                    if (string_case_compare(str1, str2) < 0) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                }
             }
         }
         if (!swapped) {
@@ -549,7 +596,7 @@ int main(void) {
             remove_character(party, &party_size);
             break;
         case MENU_SORT:
-            array_sort_stats(party, party_size, STAT_STRENGTH);
+            array_sort_stats(party, party_size);
             break;
         default:
             printf("MENU FUCKED\n");
