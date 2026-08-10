@@ -27,6 +27,8 @@ int string_case_compare(char str1[], char str2[]) {
 #endif
 }
 
+static const int MENU_DELAY = 1000;
+
 enum arr_len {
     CHARACTER_NAME_LENGTH = 16,
     ITEM_NAME_LENGTH = 32,
@@ -40,7 +42,6 @@ enum menu_option {
     MENU_CHANGE,
     MENU_REMOVE,
     MENU_SORT,
-    MENU_QUIT,
     MENU_COUNT
 };
 
@@ -76,10 +77,11 @@ enum sort {
     SORT_INTELLIGENCE,
     SORT_STAMINA,
     SORT_RESILIENCE,
-    SORT_SPIRIT
+    SORT_SPIRIT,
+    SORT_COUNT
 };
 
-enum order { ORDER_ASCENDING, ORDER_DESCENDING };
+enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT };
 
 struct stats {
     uint8_t strength;
@@ -150,14 +152,20 @@ struct character {
     size_t inventory_size;
 };
 
+void delay(int milliseconds) {
+    clock_t start_time = clock();
+    while ((start_time + clock()) * 1000 * CLOCKS_PER_SEC < milliseconds)
+        ;
+}
+
 void struct_swap(struct character *a, struct character *b) {
     struct character temp = *a;
     *a = *b;
     *b = temp;
 }
 
-void array_sort_stats(struct character party[], size_t array_size,
-                      enum sort sort_id, enum order order_id) {
+void array_sort(struct character party[], size_t array_size, enum sort sort_id,
+                enum order order_id) {
     for (size_t i = 0; i < array_size; i++) {
         bool swapped = false;
         for (size_t j = 0; j < array_size - i - 1; j++) {
@@ -192,6 +200,8 @@ void array_sort_stats(struct character party[], size_t array_size,
                 strcpy(str1, party[j].name);
                 strcpy(str2, party[j + 1].name);
                 break;
+            case SORT_COUNT:
+                printf("SORT UNDEFINED");
             }
             if (sort_id != SORT_NAME) {
                 switch (order_id) {
@@ -207,6 +217,9 @@ void array_sort_stats(struct character party[], size_t array_size,
                         swapped = true;
                     }
                     break;
+                default:
+                    printf("CRITICAL ERROR");
+                    break;
                 }
             } else {
                 switch (order_id) {
@@ -221,6 +234,9 @@ void array_sort_stats(struct character party[], size_t array_size,
                         struct_swap(&party[j], &party[j + 1]);
                         swapped = true;
                     }
+                    break;
+                default:
+                    printf("CRITICAL ERROR");
                     break;
                 }
             }
@@ -246,10 +262,9 @@ static const char *get_job_string(const enum job job_id) {
         return "Paladin";
     case JOB_ASSASSIN:
         return "Assassin";
-    case JOB_COUNT:
+    default:
         return "JOB UNDEFINED";
     }
-    return "JOB UNDEFINED";
 }
 
 static const char *get_menu_string(const enum menu_option option_id) {
@@ -260,16 +275,45 @@ static const char *get_menu_string(const enum menu_option option_id) {
         return "View party";
     case MENU_CHANGE:
         return "Change job";
-    case MENU_QUIT:
-        return "Quit";
     case MENU_REMOVE:
         return "Remove a character";
     case MENU_SORT:
         return "Sort characters";
-    case MENU_COUNT:
+    default:
         return "MENU UNDEFINED";
     }
-    return "MENU UNDEFINED";
+}
+
+static const char *get_sort_string(const enum sort sort_id) {
+    switch (sort_id) {
+    case SORT_NAME:
+        return "Sort by Name";
+    case SORT_STRENGTH:
+        return "Sort by Strength";
+    case SORT_AGILITY:
+        return "Sort by Agility";
+    case SORT_INTELLIGENCE:
+        return "Sort by Intelligence";
+    case SORT_STAMINA:
+        return "Sort by Stamina";
+    case SORT_RESILIENCE:
+        return "Sort by Stamina";
+    case SORT_SPIRIT:
+        return "Sort by Spirit";
+    default:
+        return "SORT UNDEFINED";
+    }
+}
+
+static const char *get_order_string(const enum order order_id) {
+    switch (order_id) {
+    case ORDER_ASCENDING:
+        return "Order by Ascending";
+    case ORDER_DESCENDING:
+        return "Order by Descending";
+    default:
+        return "ORDER UNDEFINED";
+    }
 }
 
 // Cleans user input and will return status
@@ -359,8 +403,7 @@ void read_status(enum status status_id) {
     case STATUS_INVALID_OPTION:
         printf("Not an option");
         break;
-    case STATUS_OKAY:
-        printf("Ok");
+    default:
         break;
     }
     wait_enter();
@@ -373,21 +416,21 @@ void render_party(const struct character party[], size_t party_size) {
     }
 }
 
-void render_quit(const size_t party_size) {
-    printf("\n\n%zu| Quit\n\n", party_size + 1);
+void render_quit(const size_t count) {
+    printf("\n%zu| Quit\n\n", count + 1);
     printf("> ");
 }
 
-enum selection validate_party_input(int *input, const enum status input_status,
-                                    const size_t party_size) {
+enum selection validate_input(int *input, const enum status input_status,
+                              const size_t count) {
     if (input_status == STATUS_OKAY) {
         (*input)--;
-        if ((size_t)*input < party_size && *input >= 0) {
+        if ((size_t)*input < count && *input >= 0) {
             return SELECTION_VALID;
-        } else if ((size_t)*input == party_size) {
+        } else if ((size_t)*input == count) {
             return SELECTION_QUIT;
         } else {
-            read_status(STATUS_INVALID_INPUT);
+            read_status(STATUS_INVALID_OPTION);
             return SELECTION_INVALID;
         }
     } else {
@@ -407,17 +450,15 @@ enum menu_option render_menu(const size_t party_size) {
         for (int i = 0; i < MENU_COUNT; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
-        printf("\n> ");
+        render_quit(MENU_COUNT);
         input_status = clean_input_int(&input, 1);
-        if (input_status == STATUS_OKAY) {
-            input--;
-            if (input < MENU_COUNT && input >= 0) {
-                return input;
-            } else {
-                read_status(STATUS_INVALID_OPTION);
-            }
-        } else {
-            read_status(input_status);
+        switch (validate_input(&input, input_status, MENU_COUNT)) {
+        case SELECTION_VALID:
+            return input;
+        case SELECTION_QUIT:
+            return MENU_COUNT;
+        case SELECTION_INVALID:
+            break;
         }
     }
 }
@@ -501,7 +542,7 @@ void remove_character(struct character party[], size_t *party_size) {
             render_party(party, *party_size);
             render_quit(*party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_party_input(&input, input_status, *party_size)) {
+            switch (validate_input(&input, input_status, *party_size)) {
             case SELECTION_VALID:
                 for (size_t i = input; i < *party_size - 1; i++) {
                     party[i] = party[i + 1];
@@ -533,7 +574,7 @@ void view_character(const struct character party[], size_t party_size) {
             render_party(party, party_size);
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_party_input(&input, input_status, party_size)) {
+            switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
                 render_party_character(party[input]);
                 break;
@@ -557,7 +598,7 @@ void change_job(struct character party[], const size_t party_size) {
             render_party(party, party_size);
             render_quit(party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_party_input(&input, input_status, party_size)) {
+            switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
                 add_job(&party[input]);
                 render_party_character(party[input]);
@@ -570,6 +611,49 @@ void change_job(struct character party[], const size_t party_size) {
         }
     } else {
         read_status(STATUS_EMPTY);
+    }
+}
+
+void render_sort() {
+    clear_terminal();
+    for (int i = 0; i < SORT_COUNT; i++) {
+        printf("%d| %s\n", i + 1, get_sort_string(i));
+    }
+}
+
+void render_order() {
+    clear_terminal();
+    for (int i = 0; i < ORDER_COUNT; i++) {
+        printf("%d| %s\n", i + 1, get_order_string(i));
+    }
+}
+
+void sort_character(struct character party[], size_t party_size) {
+    enum status sort_status, order_status;
+    int sort, order;
+    while (true) {
+        render_sort();
+        render_quit(SORT_COUNT);
+        sort_status = clean_input_int(&sort, 1);
+        switch (validate_input(&sort, sort_status, SORT_COUNT)) {
+        case SELECTION_VALID:
+            render_order();
+            render_quit(ORDER_COUNT);
+            order_status = clean_input_int(&order, 1);
+            switch (validate_input(&order, order_status, ORDER_COUNT)) {
+            case SELECTION_VALID:
+                array_sort(party, party_size, sort, order);
+            case SELECTION_QUIT:
+                return;
+            case SELECTION_INVALID:
+                break;
+            }
+            break;
+        case SELECTION_QUIT:
+            return;
+        case SELECTION_INVALID:
+            break;
+        }
     }
 }
 
@@ -589,18 +673,16 @@ int main(void) {
         case MENU_CHANGE:
             change_job(party, party_size);
             break;
-        case MENU_QUIT:
-            running = false;
-            break;
         case MENU_REMOVE:
             remove_character(party, &party_size);
             break;
         case MENU_SORT:
-            array_sort_stats(party, party_size);
+            sort_character(party, party_size);
             break;
         default:
-            printf("MENU FUCKED\n");
-            return 1;
+            printf("Quitting");
+            delay(MENU_DELAY);
+            return 0;
         }
     }
     clear_terminal();
