@@ -152,101 +152,6 @@ struct character {
     size_t inventory_size;
 };
 
-void delay(int milliseconds) {
-    clock_t start_time = clock();
-    while ((start_time + clock()) * 1000 * CLOCKS_PER_SEC < milliseconds)
-        ;
-}
-
-void struct_swap(struct character *a, struct character *b) {
-    struct character temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-void array_sort(struct character party[], size_t array_size, enum sort sort_id,
-                enum order order_id) {
-    for (size_t i = 0; i < array_size; i++) {
-        bool swapped = false;
-        for (size_t j = 0; j < array_size - i - 1; j++) {
-            uint8_t a, b;
-            char str1[CHARACTER_NAME_LENGTH], str2[CHARACTER_NAME_LENGTH];
-            switch (sort_id) {
-            case SORT_STRENGTH:
-                a = party[j].stats.strength;
-                b = party[j + 1].stats.strength;
-                break;
-            case SORT_AGILITY:
-                a = party[j].stats.agility;
-                b = party[j + 1].stats.agility;
-                break;
-            case SORT_INTELLIGENCE:
-                a = party[j].stats.intelligence;
-                b = party[j + 1].stats.intelligence;
-                break;
-            case SORT_STAMINA:
-                a = party[j].stats.stamina;
-                b = party[j + 1].stats.stamina;
-                break;
-            case SORT_RESILIENCE:
-                a = party[j].stats.resilience;
-                b = party[j + 1].stats.resilience;
-                break;
-            case SORT_SPIRIT:
-                a = party[j].stats.spirit;
-                b = party[j + 1].stats.spirit;
-                break;
-            case SORT_NAME:
-                strcpy(str1, party[j].name);
-                strcpy(str2, party[j + 1].name);
-                break;
-            case SORT_COUNT:
-                printf("SORT UNDEFINED");
-            }
-            if (sort_id != SORT_NAME) {
-                switch (order_id) {
-                case ORDER_ASCENDING:
-                    if (a > b) {
-                        struct_swap(&party[j], &party[j + 1]);
-                        swapped = true;
-                    }
-                    break;
-                case ORDER_DESCENDING:
-                    if (a < b) {
-                        struct_swap(&party[j], &party[j + 1]);
-                        swapped = true;
-                    }
-                    break;
-                default:
-                    printf("CRITICAL ERROR");
-                    break;
-                }
-            } else {
-                switch (order_id) {
-                case ORDER_ASCENDING:
-                    if (string_case_compare(str1, str2) > 0) {
-                        struct_swap(&party[j], &party[j + 1]);
-                        swapped = true;
-                    }
-                    break;
-                case ORDER_DESCENDING:
-                    if (string_case_compare(str1, str2) < 0) {
-                        struct_swap(&party[j], &party[j + 1]);
-                        swapped = true;
-                    }
-                    break;
-                default:
-                    printf("CRITICAL ERROR");
-                    break;
-                }
-            }
-        }
-        if (!swapped) {
-            return;
-        }
-    }
-}
-
 // Returns a string literal for the given job's display name
 static const char *get_job_string(const enum job job_id) {
     switch (job_id) {
@@ -316,6 +221,105 @@ static const char *get_order_string(const enum order order_id) {
     }
 }
 
+void delay(int milliseconds) {
+    clock_t start = clock();
+    while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
+        ;
+}
+
+void struct_swap(struct character *a, struct character *b) {
+    struct character temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void array_sort(struct character party[], size_t array_size, enum sort sort_id,
+                enum order order_id) {
+    for (size_t i = 0; i < array_size; i++) {
+        bool swapped = false;
+        for (size_t j = 0; j < array_size - i - 1; j++) {
+            uint8_t a, b;
+            char str1[CHARACTER_NAME_LENGTH], str2[CHARACTER_NAME_LENGTH];
+            switch (sort_id) {
+            case SORT_STRENGTH:
+                a = party[j].stats.strength;
+                b = party[j + 1].stats.strength;
+                break;
+            case SORT_AGILITY:
+                a = party[j].stats.agility;
+                b = party[j + 1].stats.agility;
+                break;
+            case SORT_INTELLIGENCE:
+                a = party[j].stats.intelligence;
+                b = party[j + 1].stats.intelligence;
+                break;
+            case SORT_STAMINA:
+                a = party[j].stats.stamina;
+                b = party[j + 1].stats.stamina;
+                break;
+            case SORT_RESILIENCE:
+                a = party[j].stats.resilience;
+                b = party[j + 1].stats.resilience;
+                break;
+            case SORT_SPIRIT:
+                a = party[j].stats.spirit;
+                b = party[j + 1].stats.spirit;
+                break;
+            case SORT_NAME:
+                strcpy(str1, party[j].name);
+                strcpy(str2, party[j + 1].name);
+                break;
+            case SORT_COUNT:
+                clear_terminal();
+                printf("%s", get_sort_string(SORT_COUNT));
+                break;
+            }
+            if (sort_id != SORT_NAME) {
+                switch (order_id) {
+                case ORDER_ASCENDING:
+                    if (a > b) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_DESCENDING:
+                    if (a < b) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_COUNT:
+                    clear_terminal();
+                    printf("%s", get_order_string(ORDER_COUNT));
+                    break;
+                }
+            } else {
+                switch (order_id) {
+                case ORDER_ASCENDING:
+                    if (string_case_compare(str1, str2) > 0) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_DESCENDING:
+                    if (string_case_compare(str1, str2) < 0) {
+                        struct_swap(&party[j], &party[j + 1]);
+                        swapped = true;
+                    }
+                    break;
+                case ORDER_COUNT:
+                    clear_terminal();
+                    printf("%s", get_order_string(ORDER_COUNT));
+                    break;
+                }
+            }
+        }
+        if (!swapped) {
+            return;
+        }
+    }
+}
+
 // Cleans user input and will return status
 int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
@@ -374,7 +378,7 @@ enum status clean_input_int(int *num, int digit_count) {
 // Waits until user inputs anything to continue
 void wait_enter() {
     char input;
-    printf("\npress enter to continue...\n\n");
+    printf("\npress enter to continue...");
     clean_input(&input, sizeof(input));
 }
 
@@ -383,22 +387,22 @@ void read_status(enum status status_id) {
     clear_terminal();
     switch (status_id) {
     case STATUS_NULL_INPUT:
-        printf("You cannot input NULL\n");
+        printf("You cannot input NULL");
         break;
     case STATUS_LONG_INPUT:
-        printf("Input too long\n");
+        printf("Input too long");
         break;
     case STATUS_INVALID_INPUT:
-        printf("Invalid Input\n");
+        printf("Invalid Input");
         break;
     case STATUS_LIST_FULL:
-        printf("List Full\n");
+        printf("List Full");
         break;
     case STATUS_NOT_FOUND:
-        printf("Not found\n");
+        printf("Not found");
         break;
     case STATUS_EMPTY:
-        printf("Party is empty\n");
+        printf("Party is empty");
         break;
     case STATUS_INVALID_OPTION:
         printf("Not an option");
@@ -563,8 +567,8 @@ void remove_character(struct character party[], size_t *party_size) {
     }
 }
 
-// Opens menu to select invididual characters and view their name, job,
-// stats
+/* Opens menu to select invididual characters and view their name, job,
+ stats */
 void view_character(const struct character party[], size_t party_size) {
     int input;
     enum status input_status;
@@ -631,29 +635,39 @@ void render_order() {
 void sort_character(struct character party[], size_t party_size) {
     enum status sort_status, order_status;
     int sort, order;
-    while (true) {
-        render_sort();
-        render_quit(SORT_COUNT);
-        sort_status = clean_input_int(&sort, 1);
-        switch (validate_input(&sort, sort_status, SORT_COUNT)) {
-        case SELECTION_VALID:
-            render_order();
-            render_quit(ORDER_COUNT);
-            order_status = clean_input_int(&order, 1);
-            switch (validate_input(&order, order_status, ORDER_COUNT)) {
+    if (party_size > 0) {
+        while (true) {
+            render_sort();
+            render_quit(SORT_COUNT);
+            sort_status = clean_input_int(&sort, 1);
+            switch (validate_input(&sort, sort_status, SORT_COUNT)) {
             case SELECTION_VALID:
-                array_sort(party, party_size, sort, order);
+                while (true) {
+                    render_order();
+                    printf("\n> ");
+                    order_status = clean_input_int(&order, 1);
+                    switch (validate_input(&order, order_status, ORDER_COUNT)) {
+                    case SELECTION_VALID:
+                        array_sort(party, party_size, sort, order);
+                        render_party(party, party_size);
+                        wait_enter();
+                        return;
+                    case SELECTION_QUIT:
+                        read_status(STATUS_INVALID_OPTION);
+                        break;
+                    case SELECTION_INVALID:
+                        break;
+                    }
+                }
+                break;
             case SELECTION_QUIT:
                 return;
             case SELECTION_INVALID:
                 break;
             }
-            break;
-        case SELECTION_QUIT:
-            return;
-        case SELECTION_INVALID:
-            break;
         }
+    } else {
+        read_status(STATUS_EMPTY);
     }
 }
 
@@ -680,11 +694,12 @@ int main(void) {
             sort_character(party, party_size);
             break;
         default:
-            printf("Quitting");
+            running = false;
+            clear_terminal();
+            printf("Quitting...");
             delay(MENU_DELAY);
+            clear_terminal();
             return 0;
         }
     }
-    clear_terminal();
-    return 0;
 }
