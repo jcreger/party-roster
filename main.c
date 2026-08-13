@@ -152,7 +152,7 @@ struct character {
     size_t inventory_size;
 };
 
-// Returns a string literal for the given job's display name
+// returns job string literal to be used in printf
 static const char *get_job_string(const enum job job_id) {
     switch (job_id) {
     case JOB_FIGHTER:
@@ -172,6 +172,7 @@ static const char *get_job_string(const enum job job_id) {
     }
 }
 
+// returns menu string literal to be used in printf
 static const char *get_menu_string(const enum menu_option option_id) {
     switch (option_id) {
     case MENU_ADD:
@@ -189,6 +190,7 @@ static const char *get_menu_string(const enum menu_option option_id) {
     }
 }
 
+// returns sort string literal to be used in printf
 static const char *get_sort_string(const enum sort sort_id) {
     switch (sort_id) {
     case SORT_NAME:
@@ -210,6 +212,7 @@ static const char *get_sort_string(const enum sort sort_id) {
     }
 }
 
+// returns order string literal to be used in printf
 static const char *get_order_string(const enum order order_id) {
     switch (order_id) {
     case ORDER_ASCENDING:
@@ -221,18 +224,21 @@ static const char *get_order_string(const enum order order_id) {
     }
 }
 
+// Delay function with minimal truncating
 void delay(int milliseconds) {
     clock_t start = clock();
     while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
         ;
 }
 
+// Helper swap function for bubble sort
 void struct_swap(struct character *a, struct character *b) {
     struct character temp = *a;
     *a = *b;
     *b = temp;
 }
 
+// Bubble sort that handles type and order
 void array_sort(struct character party[], size_t array_size, enum sort sort_id,
                 enum order order_id) {
     for (size_t i = 0; i < array_size; i++) {
@@ -348,7 +354,6 @@ enum status clean_input_int(int *num, int digit_count) {
     char string[digit_count + 1];
     size_t string_size = sizeof(string);
     *num = 0;
-
     if (fgets(string, string_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
     }
@@ -413,6 +418,7 @@ void read_status(enum status status_id) {
     wait_enter();
 }
 
+// Renders a menu for the entire party
 void render_party(const struct character party[], size_t party_size) {
     clear_terminal();
     for (size_t i = 0; i < party_size; i++) {
@@ -420,11 +426,13 @@ void render_party(const struct character party[], size_t party_size) {
     }
 }
 
+// Renders the quit menu
 void render_quit(const size_t count) {
     printf("\n%zu| Quit\n\n", count + 1);
     printf("> ");
 }
 
+// Validates integer input of a user works for a menu and returns codes for the selection
 enum selection validate_input(int *input, const enum status input_status,
                               const size_t count) {
     if (input_status == STATUS_OKAY) {
@@ -443,11 +451,10 @@ enum selection validate_input(int *input, const enum status input_status,
     }
 }
 
-// Render the main menu and return valid user input
+// Render the main menu and return valid user input, returns the user input
 enum menu_option render_menu(const size_t party_size) {
     int input;
     enum status input_status;
-
     while (true) {
         clear_terminal();
         printf("%zu/4 Characters\n\n", party_size);
@@ -467,10 +474,10 @@ enum menu_option render_menu(const size_t party_size) {
     }
 }
 
+// Allows the user to enter and assign a name to a character
 void add_name(struct character *character) {
     char name[CHARACTER_NAME_LENGTH];
     enum status name_status;
-
     while (true) {
         clear_terminal();
         printf("Name: ");
@@ -484,10 +491,10 @@ void add_name(struct character *character) {
     }
 }
 
+// Allows the user to select and assign a job to a character
 void add_job(struct character *character) {
     enum status job_status;
     int job_id;
-
     while (true) {
         clear_terminal();
         for (int i = 0; i < JOB_COUNT; i++) {
@@ -511,6 +518,7 @@ void add_job(struct character *character) {
     }
 }
 
+// Renders information of a character
 void render_party_character(const struct character character) {
     clear_terminal();
     printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
@@ -526,7 +534,6 @@ void render_party_character(const struct character character) {
 // Creates a new character struct in party
 void add_character(struct character party[], size_t *party_size) {
     int index = *party_size;
-
     if (*party_size < MAX_PARTY_SIZE) {
         add_name(&party[index]);
         add_job(&party[index]);
@@ -537,10 +544,11 @@ void add_character(struct character party[], size_t *party_size) {
     }
 }
 
+// Removes a character from the party array by shifting values to the left then
+// setting the memory to 0
 void remove_character(struct character party[], size_t *party_size) {
     enum status input_status;
     int input;
-
     if (*party_size > 0) {
         while (true) {
             render_party(party, *party_size);
@@ -551,6 +559,7 @@ void remove_character(struct character party[], size_t *party_size) {
                 for (size_t i = input; i < *party_size - 1; i++) {
                     party[i] = party[i + 1];
                 }
+                memset(&party[*party_size - 1], '\0', sizeof(struct character));
                 (*party_size)--;
                 if (*party_size == 0) {
                     return;
@@ -567,12 +576,10 @@ void remove_character(struct character party[], size_t *party_size) {
     }
 }
 
-/* Opens menu to select invididual characters and view their name, job,
- stats */
+// Opens menu to select invididual characters and view their name, job, stats
 void view_character(const struct character party[], size_t party_size) {
     int input;
     enum status input_status;
-
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
@@ -593,10 +600,10 @@ void view_character(const struct character party[], size_t party_size) {
     }
 }
 
+// Allows the user to swap the job of a party member
 void change_job(struct character party[], const size_t party_size) {
     int input;
     enum status input_status;
-
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
@@ -618,6 +625,7 @@ void change_job(struct character party[], const size_t party_size) {
     }
 }
 
+// Renders the sorting menu
 void render_sort() {
     clear_terminal();
     for (int i = 0; i < SORT_COUNT; i++) {
@@ -625,6 +633,7 @@ void render_sort() {
     }
 }
 
+// Renders the ordering menu
 void render_order() {
     clear_terminal();
     for (int i = 0; i < ORDER_COUNT; i++) {
@@ -632,6 +641,7 @@ void render_order() {
     }
 }
 
+// Opens a menu that allows the user to select a sort method then order
 void sort_character(struct character party[], size_t party_size) {
     enum status sort_status, order_status;
     int sort, order;
