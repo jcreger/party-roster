@@ -1,6 +1,6 @@
 #include "character.h"
-#include "render.h"
 #include "input.h"
+#include "render.h"
 #include <stdbool.h>
 #include <string.h>
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
@@ -92,15 +92,6 @@ void array_sort(struct character party[], size_t array_size, enum sort sort_id,
             case SORT_RESILIENCE:
                 a = party[j].stats.resilience;
                 b = party[j + 1].stats.resilience;
-
-                struct character {
-                    char name[CHARACTER_NAME_LENGTH];
-                    enum job job;
-                    struct stats stats;
-                    struct item_instance inventory[50];
-                    size_t inventory_size;
-                };
-
                 break;
             case SORT_SPIRIT:
                 a = party[j].stats.spirit;
