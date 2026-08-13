@@ -5,9 +5,25 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+
+struct item_definition iron_sword = {
+    .name = "Iron Sword",
+    .value = 50,
+    .type = ITEM_WEAPON,
+    .data.weapon = {.attack_power = 10, .attack_speed = 1}};
+
+void print_item(const struct item_definition *item) {
+    printf("\n\nNAME: %s\nVALUE: %d\n", item->name, item->value);
+    switch (item->type) {
+    case ITEM_WEAPON:
+        printf("TYPE: WEAPON\n%d DAMAGE\n%d ATTACK SPEED\n",
+               item->data.weapon.attack_power, item->data.weapon.attack_speed);
+        break;
+    default:
+        printf("ERROR");
+        break;
+    }
+}
 
 int main(void) {
     struct character party[MAX_PARTY_SIZE];
@@ -32,6 +48,8 @@ int main(void) {
             sort_character(party, party_size);
             break;
         default:
+            print_item(&iron_sword);
+            wait_enter();
             running = false;
             clear_terminal();
             printf("Quitting...");

@@ -22,6 +22,8 @@ enum job {
     JOB_COUNT
 };
 
+enum armor_slot { ARMOR_HEAD, ARMOR_TORSO, ARMOR_LEG, ARMOR_ARM, ARMOR_BOOT };
+
 struct stats {
     uint8_t strength;
     uint8_t agility;
@@ -31,10 +33,33 @@ struct stats {
     uint8_t spirit;
 };
 
+struct weapon_data {
+    int attack_power;
+    int attack_speed;
+};
+
+struct armor_data {
+    int defense;
+    enum armor_slot slot;
+};
+
+struct recovery_data {
+    int heal_amount;
+};
+struct key_item_data {
+    int quest_id;
+};
+
 struct item_definition {
     char name[ITEM_NAME_LENGTH];
     uint16_t value;
-    enum item_type item_type;
+    enum item_type type;
+    union data {
+        struct weapon_data weapon;
+        struct armor_data armor;
+        struct recovery_data recovery;
+        struct key_item_data key_item;
+    } data;
 };
 
 struct item_instance {
@@ -50,7 +75,6 @@ struct character {
     size_t inventory_size;
 };
 
-extern struct item_definition item_table[MAX_ITEM_COUNT];
 extern struct stats stats_table[JOB_COUNT];
 
 void add_character(struct character party[], size_t *party_size);

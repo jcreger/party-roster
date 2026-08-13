@@ -7,8 +7,6 @@
 #include <strings.h>
 #endif
 
-struct item_definition item_table[MAX_ITEM_COUNT];
-
 struct stats stats_table[JOB_COUNT] = {
     [JOB_FIGHTER] = {.strength = 20,
                      .agility = 10,
