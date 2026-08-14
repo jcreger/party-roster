@@ -264,7 +264,7 @@ void view_character(const struct character party[], size_t party_size) {
 }
 
 // Allows the user to swap the job of a party member
-void change_job(struct character party[], const size_t party_size) {
+void change_character(struct character party[], const size_t party_size) {
     int input;
     enum status input_status;
     if (party_size > 0) {

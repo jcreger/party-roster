@@ -1,0 +1,76 @@
+#ifndef TYPES_H
+#define TYPES_H
+
+enum item_type {
+    ITEM_TYPE_WEAPON,
+    ITEM_TYPE_ARMOR,
+    ITEM_TYPE_RECOVERY,
+    ITEM_TYPE_KEYITEM,
+};
+
+enum item {
+    ITEM_SWORD_COPPER,
+    ITEM_ARMOR_LEATHER,
+    ITEM_POTION,
+    ITEM_KEY,
+};
+
+enum armor_slot {
+    ARMOR_HEAD,
+    ARMOR_TORSO,
+    ARMOR_LEG,
+    ARMOR_ARM,
+    ARMOR_BOOT,
+};
+enum arr_len {
+    CHARACTER_NAME_LENGTH = 16,
+    ITEM_NAME_LENGTH = 32,
+    MAX_ITEM_COUNT = 255,
+    MAX_PARTY_SIZE = 4,
+};
+
+enum job {
+    JOB_FIGHTER,
+    JOB_THIEF,
+    JOB_MAGE,
+    JOB_ROGUE,
+    JOB_PALADIN,
+    JOB_ASSASSIN,
+    JOB_COUNT
+};
+enum status {
+    STATUS_OKAY,
+    STATUS_NOT_FOUND,
+    STATUS_INVALID_INPUT,
+    STATUS_NULL_INPUT,
+    STATUS_LONG_INPUT,
+    STATUS_LIST_FULL,
+    STATUS_EMPTY,
+    STATUS_INVALID_OPTION
+};
+
+enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
+
+enum menu_option {
+    MENU_ADD,
+    MENU_VIEW,
+    MENU_CHANGE,
+    MENU_REMOVE,
+    MENU_SORT,
+    MENU_COUNT
+};
+
+enum sort {
+    SORT_NAME,
+    SORT_STRENGTH,
+    SORT_AGILITY,
+    SORT_INTELLIGENCE,
+    SORT_STAMINA,
+    SORT_RESILIENCE,
+    SORT_SPIRIT,
+    SORT_COUNT
+};
+
+enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT };
+
+#endif

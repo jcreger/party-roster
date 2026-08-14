@@ -1,22 +1,10 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "types.h"
 #include <stdio.h>
 
 extern const int MENU_DELAY;
-
-enum status {
-    STATUS_OKAY,
-    STATUS_NOT_FOUND,
-    STATUS_INVALID_INPUT,
-    STATUS_NULL_INPUT,
-    STATUS_LONG_INPUT,
-    STATUS_LIST_FULL,
-    STATUS_EMPTY,
-    STATUS_INVALID_OPTION
-};
-
-enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
 
 int clean_input(char string[], const size_t string_size);
 enum status clean_input_int(int *num, int digit_count);

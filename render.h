@@ -1,30 +1,9 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include "character.h"
+#include "types.h"
 #include <stdlib.h>
 
-enum menu_option {
-    MENU_ADD,
-    MENU_VIEW,
-    MENU_CHANGE,
-    MENU_REMOVE,
-    MENU_SORT,
-    MENU_COUNT
-};
-
-enum sort {
-    SORT_NAME,
-    SORT_STRENGTH,
-    SORT_AGILITY,
-    SORT_INTELLIGENCE,
-    SORT_STAMINA,
-    SORT_RESILIENCE,
-    SORT_SPIRIT,
-    SORT_COUNT
-};
-
-enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT };
 
 const char *get_job_string(const enum job job_id);
 const char *get_menu_string(const enum menu_option option_id);

@@ -1,28 +1,8 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#include "item.h"
 #include <stdint.h>
-
-enum arr_len {
-    CHARACTER_NAME_LENGTH = 16,
-    ITEM_NAME_LENGTH = 32,
-    MAX_ITEM_COUNT = 255,
-    MAX_PARTY_SIZE = 4,
-};
-
-enum item_type { ITEM_WEAPON, ITEM_ARMOR, ITEM_RECOVERY, ITEM_KEYITEM };
-
-enum job {
-    JOB_FIGHTER,
-    JOB_THIEF,
-    JOB_MAGE,
-    JOB_ROGUE,
-    JOB_PALADIN,
-    JOB_ASSASSIN,
-    JOB_COUNT
-};
-
-enum armor_slot { ARMOR_HEAD, ARMOR_TORSO, ARMOR_LEG, ARMOR_ARM, ARMOR_BOOT };
 
 struct stats {
     uint8_t strength;
@@ -31,48 +11,19 @@ struct stats {
     uint8_t stamina;
     uint8_t resilience;
     uint8_t spirit;
-};
-
-struct weapon_data {
+    int hp;
     int attack_power;
-    int attack_speed;
-};
-
-struct armor_data {
     int defense;
-    enum armor_slot slot;
-};
-
-struct recovery_data {
-    int heal_amount;
-};
-struct key_item_data {
-    int quest_id;
-};
-
-struct item_definition {
-    char name[ITEM_NAME_LENGTH];
-    uint16_t value;
-    enum item_type type;
-    union data {
-        struct weapon_data weapon;
-        struct armor_data armor;
-        struct recovery_data recovery;
-        struct key_item_data key_item;
-    } data;
-};
-
-struct item_instance {
-    uint8_t item_id;
-    uint8_t quantity;
+    int attack_speed;
 };
 
 struct character {
     char name[CHARACTER_NAME_LENGTH];
     enum job job;
     struct stats stats;
-    struct item_instance inventory[50];
+    struct item_instance inventory[25];
     size_t inventory_size;
+    struct equipment equipment;
 };
 
 extern struct stats stats_table[JOB_COUNT];
@@ -80,7 +31,7 @@ extern struct stats stats_table[JOB_COUNT];
 void add_character(struct character party[], size_t *party_size);
 void remove_character(struct character party[], size_t *party_size);
 void view_character(const struct character party[], size_t party_size);
-void change_job(struct character party[], const size_t party_size);
+void change_character(struct character party[], const size_t party_size);
 void sort_character(struct character party[], size_t party_size);
 
 #endif

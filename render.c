@@ -1,4 +1,3 @@
-#include "render.h"
 #include "character.h"
 #include "input.h"
 #include <inttypes.h>
@@ -96,7 +95,7 @@ enum menu_option render_menu(const size_t party_size) {
     enum status input_status;
     while (true) {
         clear_terminal();
-        printf("%zu/4 Characters\n\n", party_size);
+        printf("%zu/%d Characters\n\n", party_size, MAX_PARTY_SIZE);
         for (int i = 0; i < MENU_COUNT; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
