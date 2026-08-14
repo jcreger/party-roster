@@ -2,8 +2,7 @@
 #include "input.h"
 #include "item.h"
 #include "render.h"
-#include <assert.h>
-#include <inttypes.h>
+#include "types.h"
 #include <stdbool.h>
 #include <stdio.h>
 

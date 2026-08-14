@@ -1,4 +1,6 @@
 #include "input.h"
+#include "render.h"
+#include "types.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,15 +14,6 @@ void delay(int milliseconds) {
     clock_t start = clock();
     while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
         ;
-}
-
-void clear_terminal() {
-#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
-    system("clear");
-#endif
-#if defined(_WIN32) || defined(_WIN64)
-    system("cls");
-#endif
 }
 
 // Cleans user input and will return status
@@ -44,6 +37,13 @@ int clean_input(char string[], const size_t string_size) {
     } else {
         return STATUS_NULL_INPUT;
     }
+}
+
+// Waits until user inputs anything to continue
+void wait_enter() {
+    char input;
+    printf("\npress enter to continue...");
+    clean_input(&input, sizeof(input));
 }
 
 // Cleans user input and converts string to integer return status
@@ -126,11 +126,4 @@ enum selection validate_input(int *input, const enum status input_status,
         read_status(input_status);
         return SELECTION_INVALID;
     }
-}
-
-// Waits until user inputs anything to continue
-void wait_enter() {
-    char input;
-    printf("\npress enter to continue...");
-    clean_input(&input, sizeof(input));
 }

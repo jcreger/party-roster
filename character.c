@@ -1,7 +1,10 @@
 #include "character.h"
 #include "input.h"
 #include "render.h"
+#include "types.h"
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
 #include <strings.h>

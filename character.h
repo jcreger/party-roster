@@ -2,7 +2,9 @@
 #define CHARACTER_H
 
 #include "item.h"
+#include "types.h"
 #include <stdint.h>
+#include <stdio.h>
 
 struct stats {
     uint8_t strength;

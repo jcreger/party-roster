@@ -1,7 +1,10 @@
 #include "character.h"
 #include "input.h"
+#include "types.h"
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // returns job string literal to be used in printf
 const char *get_job_string(const enum job job_id) {
@@ -73,6 +76,15 @@ const char *get_order_string(const enum order order_id) {
     default:
         return "ORDER UNDEFINED";
     }
+}
+
+void clear_terminal() {
+#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+    system("clear");
+#endif
+#if defined(_WIN32) || defined(_WIN64)
+    system("cls");
+#endif
 }
 
 // Renders a menu for the entire party

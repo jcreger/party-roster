@@ -11,8 +11,6 @@ enum status clean_input_int(int *num, int digit_count);
 enum selection validate_input(int *input, const enum status input_status,
                               const size_t count);
 void wait_enter();
-void read_status(enum status status_id);
-void clear_terminal();
 void delay(int milliseconds);
 
 #endif
