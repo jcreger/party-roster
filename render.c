@@ -78,6 +78,23 @@ const char *get_order_string(const enum order order_id) {
     }
 }
 
+const char *get_slot_string(const enum armor_slot slot_id) {
+    switch (slot_id) {
+    case ARMOR_HEAD:
+        return "HELMET";
+    case ARMOR_CHEST:
+        return "CHEST";
+    case ARMOR_LEG:
+        return "LEGS";
+    case ARMOR_GLOVE:
+        return "GLOVES";
+    case ARMOR_BOOT:
+        return "BOOTS";
+    default:
+        return "SLOT UNDEFINED";
+    }
+}
+
 void clear_terminal() {
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
     system("clear");

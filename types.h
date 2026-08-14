@@ -10,16 +10,16 @@ enum item_type {
 
 enum item {
     ITEM_SWORD_COPPER,
-    ITEM_ARMOR_LEATHER,
+    ITEM_ARMOR_CHEST_LEATHER,
     ITEM_POTION,
     ITEM_KEY,
 };
 
 enum armor_slot {
     ARMOR_HEAD,
-    ARMOR_TORSO,
+    ARMOR_CHEST,
     ARMOR_LEG,
-    ARMOR_ARM,
+    ARMOR_GLOVE,
     ARMOR_BOOT,
 };
 enum arr_len {

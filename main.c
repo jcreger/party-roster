@@ -30,7 +30,7 @@ int main(void) {
             break;
         default:
             clear_terminal();
-            print_item(&item_table[ITEM_SWORD_COPPER]);
+            print_item(&item_table[ITEM_ARMOR_CHEST_LEATHER]);
             wait_enter();
             running = false;
             clear_terminal();
