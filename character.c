@@ -224,9 +224,9 @@ void remove_character(struct character party[], size_t *party_size) {
     if (*party_size > 0) {
         while (true) {
             render_party(party, *party_size);
-            render_quit(*party_size);
+            render_back(*party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, *party_size)) {
+            switch (validate_input(&input, input_status, *party_size, true)) {
             case SELECTION_VALID:
                 for (size_t i = input; i < *party_size - 1; i++) {
                     party[i] = party[i + 1];
@@ -237,7 +237,7 @@ void remove_character(struct character party[], size_t *party_size) {
                     return;
                 }
                 break;
-            case SELECTION_QUIT:
+            case SELECTION_BACK:
                 return;
             case SELECTION_INVALID:
                 break;
@@ -255,13 +255,13 @@ void view_character(const struct character party[], size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
-            render_quit(party_size);
+            render_back(party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, party_size)) {
+            switch (validate_input(&input, input_status, party_size, true)) {
             case SELECTION_VALID:
                 render_party_character(party[input]);
                 break;
-            case SELECTION_QUIT:
+            case SELECTION_BACK:
                 return;
             case SELECTION_INVALID:
                 break;
@@ -279,14 +279,14 @@ void change_character(struct character party[], const size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
-            render_quit(party_size);
+            render_back(party_size);
             input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, party_size)) {
+            switch (validate_input(&input, input_status, party_size, true)) {
             case SELECTION_VALID:
                 add_job(&party[input]);
                 render_party_character(party[input]);
                 break;
-            case SELECTION_QUIT:
+            case SELECTION_BACK:
                 return;
             case SELECTION_INVALID:
                 break;
@@ -304,21 +304,21 @@ void sort_character(struct character party[], size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_sort();
-            render_quit(SORT_COUNT);
+            render_back(SORT_COUNT);
             sort_status = clean_input_int(&sort, 1);
-            switch (validate_input(&sort, sort_status, SORT_COUNT)) {
+            switch (validate_input(&sort, sort_status, SORT_COUNT, true)) {
             case SELECTION_VALID:
                 while (true) {
                     render_order();
                     printf("\n> ");
                     order_status = clean_input_int(&order, 1);
-                    switch (validate_input(&order, order_status, ORDER_COUNT)) {
+                    switch (validate_input(&order, order_status, ORDER_COUNT, true)) {
                     case SELECTION_VALID:
                         array_sort(party, party_size, sort, order);
                         render_party(party, party_size);
                         wait_enter();
                         return;
-                    case SELECTION_QUIT:
+                    case SELECTION_BACK:
                         read_status(STATUS_INVALID_OPTION);
                         break;
                     case SELECTION_INVALID:
@@ -326,7 +326,7 @@ void sort_character(struct character party[], size_t party_size) {
                     }
                 }
                 break;
-            case SELECTION_QUIT:
+            case SELECTION_BACK:
                 return;
             case SELECTION_INVALID:
                 break;

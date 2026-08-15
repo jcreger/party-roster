@@ -38,6 +38,8 @@ const char *get_menu_string(const enum menu_option option_id) {
         return "Remove a character";
     case MENU_SORT:
         return "Sort characters";
+    case MENU_QUIT:
+        return "Quit";
     default:
         return "MENU UNDEFINED";
     }
@@ -103,6 +105,37 @@ void clear_terminal() {
 #endif
 }
 
+// Print user error messages
+void read_status(enum status status_id) {
+    clear_terminal();
+    switch (status_id) {
+    case STATUS_NULL_INPUT:
+        printf("You cannot input NULL");
+        break;
+    case STATUS_LONG_INPUT:
+        printf("Input too long");
+        break;
+    case STATUS_INVALID_INPUT:
+        printf("Invalid Input");
+        break;
+    case STATUS_LIST_FULL:
+        printf("List Full");
+        break;
+    case STATUS_NOT_FOUND:
+        printf("Not found");
+        break;
+    case STATUS_EMPTY:
+        printf("Party is empty");
+        break;
+    case STATUS_INVALID_OPTION:
+        printf("Not an option");
+        break;
+    default:
+        break;
+    }
+    wait_enter();
+}
+
 // Renders a menu for the entire party
 void render_party(const struct character party[], size_t party_size) {
     clear_terminal();
@@ -112,8 +145,8 @@ void render_party(const struct character party[], size_t party_size) {
 }
 
 // Renders the quit menu
-void render_quit(const size_t count) {
-    printf("\n%zu| Quit\n\n", count + 1);
+void render_back(const size_t count) {
+    printf("\n%zu| Back\n\n", count + 1);
     printf("> ");
 }
 
@@ -124,16 +157,16 @@ enum menu_option render_menu(const size_t party_size) {
     while (true) {
         clear_terminal();
         printf("%zu/%d Characters\n\n", party_size, SIZE_PARTY);
-        for (int i = 0; i < MENU_COUNT; i++) {
+        for (int i = 0; i < MENU_COUNT - 1; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
-        render_quit(MENU_COUNT);
+        printf("\n%d| Quit\n\n> ", MENU_COUNT);
         input_status = clean_input_int(&input, 1);
-        switch (validate_input(&input, input_status, MENU_COUNT)) {
+        switch (validate_input(&input, input_status, MENU_COUNT, false)) {
         case SELECTION_VALID:
             return input;
-        case SELECTION_QUIT:
-            return MENU_COUNT;
+        case SELECTION_BACK:
+            break;
         case SELECTION_INVALID:
             break;
         }

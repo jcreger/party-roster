@@ -3,13 +3,14 @@
 
 #include "types.h"
 #include <stddef.h>
+#include <stdbool.h>
 
 extern const int MENU_DELAY;
 
 int clean_input(char string[], const size_t string_size);
 enum status clean_input_int(int *num, int digit_count);
 enum selection validate_input(int *input, const enum status input_status,
-                              const size_t count);
+                              const size_t count, bool back);
 void wait_enter();
 void delay(int milliseconds);
 

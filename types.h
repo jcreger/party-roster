@@ -53,7 +53,7 @@ enum status {
     STATUS_INVALID_OPTION
 };
 
-enum selection { SELECTION_VALID, SELECTION_QUIT, SELECTION_INVALID };
+enum selection { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID };
 
 enum menu_option {
     MENU_ADD,
@@ -61,6 +61,7 @@ enum menu_option {
     MENU_CHANGE,
     MENU_REMOVE,
     MENU_SORT,
+    MENU_QUIT,
     MENU_COUNT,
 };
 

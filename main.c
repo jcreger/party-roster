@@ -28,7 +28,7 @@ int main(void) {
         case MENU_SORT:
             sort_character(party, party_size);
             break;
-        default:
+        case MENU_QUIT:
             clear_terminal();
             if (party_size > 0) {
                 add_item(ITEM_SWORD_COPPER, &party[0]);
@@ -48,6 +48,8 @@ int main(void) {
             running = false;
             clear_terminal();
             return 0;
+        default:
+            return 1;
         }
     }
 }

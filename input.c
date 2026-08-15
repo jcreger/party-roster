@@ -1,7 +1,7 @@
-#include "input.h"
 #include "render.h"
 #include "types.h"
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,13 +14,6 @@ void delay(int milliseconds) {
     clock_t start = clock();
     while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
         ;
-}
-
-// Waits until user inputs anything to continue
-void wait_enter() {
-    char input;
-    printf("\npress enter to continue...");
-    clean_input(&input, sizeof(input));
 }
 
 // Cleans user input and will return status
@@ -74,41 +67,10 @@ enum status clean_input_int(int *num, int digit_count) {
     return STATUS_INVALID_INPUT;
 }
 
-// Print user error messages
-void read_status(enum status status_id) {
-    clear_terminal();
-    switch (status_id) {
-    case STATUS_NULL_INPUT:
-        printf("You cannot input NULL");
-        break;
-    case STATUS_LONG_INPUT:
-        printf("Input too long");
-        break;
-    case STATUS_INVALID_INPUT:
-        printf("Invalid Input");
-        break;
-    case STATUS_LIST_FULL:
-        printf("List Full");
-        break;
-    case STATUS_NOT_FOUND:
-        printf("Not found");
-        break;
-    case STATUS_EMPTY:
-        printf("Party is empty");
-        break;
-    case STATUS_INVALID_OPTION:
-        printf("Not an option");
-        break;
-    default:
-        break;
-    }
-    wait_enter();
-}
-
 // Validates integer input of a user works for a menu and returns codes for the
 // selection
 enum selection validate_input(int *input, const enum status input_status,
-                              const size_t count) {
+                              const size_t count, bool back) {
     if (input_status != STATUS_OKAY) {
         read_status(input_status);
         return SELECTION_INVALID;
@@ -121,9 +83,16 @@ enum selection validate_input(int *input, const enum status input_status,
     if (*input >= 0 && (size_t)*input < count) {
         return SELECTION_VALID;
     }
-    if (*input >= 0 && (size_t)*input == count) {
-        return SELECTION_QUIT;
+    if (back && *input >= 0 && (size_t)*input == count) {
+        return SELECTION_BACK;
     }
     read_status(STATUS_INVALID_OPTION);
     return SELECTION_INVALID;
+}
+
+// Waits until user inputs anything to continue
+void wait_enter() {
+    char input;
+    printf("\npress enter to continue...");
+    clean_input(&input, sizeof(input));
 }

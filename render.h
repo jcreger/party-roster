@@ -11,7 +11,7 @@ const char *get_order_string(const enum order order_id);
 const char *get_slot_string(const enum armor_slot slot_id);
 
 void render_party(const struct character party[], size_t party_size);
-void render_quit(const size_t count);
+void render_back(const size_t count);
 enum menu_option render_menu(const size_t party_size);
 void render_party_character(const struct character character);
 void render_sort();
