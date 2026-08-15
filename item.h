@@ -17,19 +17,19 @@ struct armor_data {
 struct recovery_data {
     int heal_amount;
 };
-struct key_item_data {
+struct quest_data {
     int quest_id;
 };
 
 struct item_definition {
-    char name[ITEM_NAME_LENGTH];
+    char name[LEN_NAME_ITEM];
     int value;
     enum item_type type;
     union data {
         struct weapon_data weapon;
         struct armor_data armor;
         struct recovery_data recovery;
-        struct key_item_data key_item;
+        struct quest_data quest;
     } data;
 };
 
@@ -48,6 +48,6 @@ struct equipment {
 };
 
 void print_item(const struct item_definition *item);
-extern struct item_definition item_table[MAX_ITEM_COUNT];
+extern struct item_definition item_table[SIZE_ITEM];
 
 #endif

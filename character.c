@@ -11,36 +11,42 @@
 #endif
 
 struct stats stats_table[JOB_COUNT] = {
+
     [JOB_FIGHTER] = {.strength = 20,
                      .agility = 10,
                      .intelligence = 5,
                      .stamina = 15,
                      .resilience = 10,
                      .spirit = 5},
+
     [JOB_THIEF] = {.strength = 10,
                    .agility = 20,
                    .intelligence = 5,
                    .stamina = 10,
                    .resilience = 15,
                    .spirit = 5},
+
     [JOB_MAGE] = {.strength = 5,
                   .agility = 5,
                   .intelligence = 20,
                   .stamina = 10,
                   .resilience = 10,
                   .spirit = 15},
+
     [JOB_ROGUE] = {.strength = 15,
                    .agility = 20,
                    .intelligence = 5,
                    .stamina = 10,
                    .resilience = 10,
                    .spirit = 5},
+
     [JOB_PALADIN] = {.strength = 15,
                      .agility = 5,
                      .intelligence = 10,
                      .stamina = 15,
                      .resilience = 10,
                      .spirit = 10},
+
     [JOB_ASSASSIN] = {.strength = 10,
                       .agility = 15,
                       .intelligence = 15,
@@ -72,7 +78,7 @@ void array_sort(struct character party[], size_t array_size, enum sort sort_id,
         bool swapped = false;
         for (size_t j = 0; j < array_size - i - 1; j++) {
             uint8_t a, b;
-            char str1[CHARACTER_NAME_LENGTH], str2[CHARACTER_NAME_LENGTH];
+            char str1[LEN_NAME_CHARACTER], str2[LEN_NAME_CHARACTER];
             switch (sort_id) {
             case SORT_STRENGTH:
                 a = party[j].stats.strength;
@@ -155,7 +161,7 @@ void array_sort(struct character party[], size_t array_size, enum sort sort_id,
 
 // Allows the user to enter and assign a name to a character
 static void add_name(struct character *character) {
-    char name[CHARACTER_NAME_LENGTH];
+    char name[LEN_NAME_CHARACTER];
     enum status name_status;
     while (true) {
         clear_terminal();
@@ -200,7 +206,7 @@ static void add_job(struct character *character) {
 // Creates a new character struct in party
 void add_character(struct character party[], size_t *party_size) {
     int index = *party_size;
-    if (*party_size < MAX_PARTY_SIZE) {
+    if (*party_size < SIZE_PARTY) {
         add_name(&party[index]);
         add_job(&party[index]);
         (*party_size)++;

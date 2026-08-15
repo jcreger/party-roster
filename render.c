@@ -80,15 +80,15 @@ const char *get_order_string(const enum order order_id) {
 
 const char *get_slot_string(const enum armor_slot slot_id) {
     switch (slot_id) {
-    case ARMOR_HEAD:
+    case SLOT_HEAD:
         return "HELMET";
-    case ARMOR_CHEST:
+    case SLOT_CHEST:
         return "CHEST";
-    case ARMOR_LEG:
+    case SLOT_LEG:
         return "LEGS";
-    case ARMOR_GLOVE:
+    case SLOT_GLOVE:
         return "GLOVES";
-    case ARMOR_BOOT:
+    case SLOT_BOOT:
         return "BOOTS";
     default:
         return "SLOT UNDEFINED";
@@ -124,7 +124,7 @@ enum menu_option render_menu(const size_t party_size) {
     enum status input_status;
     while (true) {
         clear_terminal();
-        printf("%zu/%d Characters\n\n", party_size, MAX_PARTY_SIZE);
+        printf("%zu/%d Characters\n\n", party_size, SIZE_PARTY);
         for (int i = 0; i < MENU_COUNT; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }

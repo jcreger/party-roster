@@ -36,9 +36,8 @@ int clean_input(char string[], const size_t string_size) {
                 ;
             memset(string, '\0', string_size);
             return STATUS_LONG_INPUT;
-        } else {
-            return STATUS_OKAY;
         }
+        return STATUS_OKAY;
     } else {
         string[strcspn(string, "\n")] = '\0';
         return STATUS_OKAY;
@@ -71,9 +70,8 @@ enum status clean_input_int(int *num, int digit_count) {
     if (atoi(string) != 0) {
         *num = atoi(string);
         return STATUS_OKAY;
-    } else {
-        return STATUS_INVALID_INPUT;
     }
+    return STATUS_INVALID_INPUT;
 }
 
 // Print user error messages
@@ -122,10 +120,10 @@ enum selection validate_input(int *input, const enum status input_status,
     (*input)--;
     if (*input >= 0 && (size_t)*input < count) {
         return SELECTION_VALID;
-    } else if (*input >= 0 && (size_t)*input == count) {
-        return SELECTION_QUIT;
-    } else {
-        read_status(STATUS_INVALID_OPTION);
-        return SELECTION_INVALID;
     }
+    if (*input >= 0 && (size_t)*input == count) {
+        return SELECTION_QUIT;
+    }
+    read_status(STATUS_INVALID_OPTION);
+    return SELECTION_INVALID;
 }

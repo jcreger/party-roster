@@ -20,7 +20,7 @@ struct stats {
 };
 
 struct character {
-    char name[CHARACTER_NAME_LENGTH];
+    char name[LEN_NAME_CHARACTER];
     enum job job;
     struct stats stats;
     struct item_instance inventory[25];

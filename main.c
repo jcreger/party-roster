@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int main(void) {
-    struct character party[MAX_PARTY_SIZE];
+    struct character party[SIZE_PARTY];
     size_t party_size = 0;
     static bool running = true;
     while (running) {
@@ -30,12 +30,10 @@ int main(void) {
             break;
         default:
             clear_terminal();
-            print_item(&item_table[ITEM_ARMOR_CHEST_LEATHER]);
+            print_item(&item_table[ITEM_KEY]);
             wait_enter();
-            running = false;
             clear_terminal();
-            printf("Quitting...");
-            delay(MENU_DELAY);
+            running = false;
             clear_terminal();
             return 0;
         }

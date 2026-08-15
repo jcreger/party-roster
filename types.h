@@ -2,31 +2,31 @@
 #define TYPES_H
 
 enum item_type {
-    ITEM_TYPE_WEAPON,
-    ITEM_TYPE_ARMOR,
-    ITEM_TYPE_RECOVERY,
-    ITEM_TYPE_KEYITEM,
+    TYPE_WEAPON,
+    TYPE_ARMOR,
+    TYPE_RECOVERY,
+    TYPE_QUEST,
 };
 
 enum item {
     ITEM_SWORD_COPPER,
-    ITEM_ARMOR_CHEST_LEATHER,
+    ITEM_CHEST_LEATHER,
     ITEM_POTION,
     ITEM_KEY,
 };
 
 enum armor_slot {
-    ARMOR_HEAD,
-    ARMOR_CHEST,
-    ARMOR_LEG,
-    ARMOR_GLOVE,
-    ARMOR_BOOT,
+    SLOT_HEAD,
+    SLOT_CHEST,
+    SLOT_LEG,
+    SLOT_GLOVE,
+    SLOT_BOOT,
 };
-enum arr_len {
-    CHARACTER_NAME_LENGTH = 16,
-    ITEM_NAME_LENGTH = 32,
-    MAX_ITEM_COUNT = 255,
-    MAX_PARTY_SIZE = 4,
+enum {
+    LEN_NAME_CHARACTER = 16,
+    LEN_NAME_ITEM = 32,
+    SIZE_ITEM = 255,
+    SIZE_PARTY = 4,
 };
 
 enum job {
