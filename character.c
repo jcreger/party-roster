@@ -1,4 +1,3 @@
-#include "character.h"
 #include "input.h"
 #include "render.h"
 #include "types.h"
@@ -209,6 +208,7 @@ void add_character(struct character party[], size_t *party_size) {
     if (*party_size < SIZE_PARTY) {
         add_name(&party[index]);
         add_job(&party[index]);
+        party[index].inventory_size = 0;
         (*party_size)++;
         render_party_character(party[index]);
     } else {

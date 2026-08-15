@@ -30,9 +30,21 @@ int main(void) {
             break;
         default:
             clear_terminal();
-            print_item(&item_table[ITEM_KEY]);
-            wait_enter();
-            clear_terminal();
+            if (party_size > 0) {
+                add_item(ITEM_SWORD_COPPER, &party[0]);
+                add_item(ITEM_SWORD_COPPER, &party[0]);
+                add_item(ITEM_SWORD_COPPER, &party[0]);
+                add_item(ITEM_CHEST_LEATHER, &party[0]);
+                add_item(ITEM_POTION, &party[0]);
+                add_item(ITEM_POTION, &party[0]);
+                add_item(ITEM_KEY, &party[0]);
+                add_item(ITEM_KEY, &party[0]);
+                add_item(ITEM_KEY, &party[0]);
+                add_item(ITEM_KEY, &party[0]);
+                print_item_instance(&party[0]);
+                wait_enter();
+                clear_terminal();
+            }
             running = false;
             clear_terminal();
             return 0;

@@ -2,7 +2,7 @@
 #define INPUT_H
 
 #include "types.h"
-#include <stdio.h>
+#include <stddef.h>
 
 extern const int MENU_DELAY;
 

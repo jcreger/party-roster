@@ -1,6 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 enum item_type {
     TYPE_WEAPON,
     TYPE_ARMOR,
@@ -27,6 +30,7 @@ enum {
     LEN_NAME_ITEM = 32,
     SIZE_ITEM = 255,
     SIZE_PARTY = 4,
+    SIZE_INVENTORY = 50,
 };
 
 enum job {
@@ -57,7 +61,7 @@ enum menu_option {
     MENU_CHANGE,
     MENU_REMOVE,
     MENU_SORT,
-    MENU_COUNT
+    MENU_COUNT,
 };
 
 enum sort {
@@ -72,5 +76,70 @@ enum sort {
 };
 
 enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT };
+
+struct weapon_data {
+    int attack_power;
+    int attack_speed;
+};
+
+struct armor_data {
+    int defense;
+    enum armor_slot slot;
+};
+
+struct recovery_data {
+    int heal_amount;
+};
+struct quest_data {
+    int quest_id;
+};
+
+struct item_definition {
+    char name[LEN_NAME_ITEM];
+    int value;
+    enum item_type type;
+    union data {
+        struct weapon_data weapon;
+        struct armor_data armor;
+        struct recovery_data recovery;
+        struct quest_data quest;
+    } data;
+};
+
+struct item_instance {
+    uint8_t item_id;
+    uint8_t quantity;
+};
+
+struct equipment {
+    int weapon;
+    int head;
+    int torso;
+    int leg;
+    int arm;
+    int boot;
+};
+
+struct stats {
+    uint8_t strength;
+    uint8_t agility;
+    uint8_t intelligence;
+    uint8_t stamina;
+    uint8_t resilience;
+    uint8_t spirit;
+    int hp;
+    int attack_power;
+    int defense;
+    int attack_speed;
+};
+
+struct character {
+    char name[LEN_NAME_CHARACTER];
+    enum job job;
+    struct stats stats;
+    struct item_instance inventory[SIZE_INVENTORY];
+    size_t inventory_size;
+    struct equipment equipment;
+};
 
 #endif

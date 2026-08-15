@@ -1,9 +1,8 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include "character.h"
 #include "types.h"
-#include <stdlib.h>
+#include <stddef.h>
 
 const char *get_job_string(const enum job job_id);
 const char *get_menu_string(const enum menu_option option_id);

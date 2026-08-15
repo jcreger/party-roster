@@ -1,4 +1,3 @@
-#include "character.h"
 #include "input.h"
 #include "types.h"
 #include <inttypes.h>
