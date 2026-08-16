@@ -12,7 +12,8 @@ const char *get_slot_string(const armor_slot slot_id);
 const char *get_type_string(const item_type type_id);
 
 void print_item(const item_definition item);
-void print_inventory(const item_instance inventory[], const size_t inventory_size);
+void print_inventory(const item_instance inventory[],
+                     const size_t inventory_size);
 
 menu_option render_menu(const size_t party_size);
 

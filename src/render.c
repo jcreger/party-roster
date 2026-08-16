@@ -192,7 +192,7 @@ menu_option render_menu(const size_t party_size) {
         case SELECTION_VALID:
             return input;
         case SELECTION_BACK:
-            return MENU_COUNT;
+            return MENU_QUIT;
             read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:
@@ -254,7 +254,8 @@ void print_item(const item_definition item) {
     }
 }
 
-void print_inventory(const item_instance inventory[], const size_t inventory_size) {
+void print_inventory(const item_instance inventory[],
+                     const size_t inventory_size) {
     clear_terminal();
     if (inventory_size <= 0) {
         read_status(STATUS_INV_EMPTY);

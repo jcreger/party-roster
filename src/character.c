@@ -189,8 +189,7 @@ void remove_character(character party[], size_t *party_size) {
                     for (size_t i = input; i < *party_size - 1; i++) {
                         party[i] = party[i + 1];
                     }
-                    memset(&party[*party_size - 1], '\0',
-                           sizeof(character));
+                    memset(&party[*party_size - 1], '\0', sizeof(character));
                     (*party_size)--;
                     if (*party_size == 0) {
                         return;

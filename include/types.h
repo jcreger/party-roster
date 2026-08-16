@@ -100,7 +100,7 @@ typedef struct {
 
 typedef struct {
     int heal_amount;
-} recovery_data ;
+} recovery_data;
 
 typedef struct {
     int quest_id;
@@ -116,12 +116,12 @@ typedef struct {
         recovery_data recovery;
         quest_data quest;
     } data;
-} item_definition; 
+} item_definition;
 
 typedef struct {
     uint8_t item_id;
     uint8_t quantity;
-} item_instance; 
+} item_instance;
 
 typedef struct {
     int weapon;
@@ -130,7 +130,7 @@ typedef struct {
     int leg;
     int arm;
     int boot;
-} equipment; 
+} equipment;
 
 typedef struct {
     uint8_t strength;

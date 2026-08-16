@@ -76,7 +76,7 @@ status clean_input_int(int *num, int digit_count) {
 // Validates integer input of a user works for a menu and returns codes for the
 // selection
 selection validate_input(int *input, const status input_status,
-                              const size_t size) {
+                         const size_t size) {
     if (input_status == STATUS_Q) {
         return SELECTION_BACK;
     }

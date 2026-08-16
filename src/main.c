@@ -1,7 +1,7 @@
 #include "character.h"
+#include "item.h"
 #include "render.h"
 #include "types.h"
-#include "item.h"
 
 #include <stdbool.h>
 #include <stdio.h>

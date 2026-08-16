@@ -1,10 +1,10 @@
-#include "types.h"
 #include "input.h"
 #include "render.h"
+#include "types.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 void add_item(item_id item_id, item_instance inventory[],
               size_t *inventory_size) {
@@ -28,20 +28,20 @@ void add_item(item_id item_id, item_instance inventory[],
 item_id select_item(void) {
     int input;
     status input_status;
-    
+
     while (true) {
-    render_item_table();
-    input_status = clean_input_int(&input, 1);
-    switch (validate_input(&input, input_status, ITEM_COUNT)) {
-    case SELECTION_VALID:
-        return input;
-    case SELECTION_BACK:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-    case SELECTION_INVALID:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-    }
+        render_item_table();
+        input_status = clean_input_int(&input, 1);
+        switch (validate_input(&input, input_status, ITEM_COUNT)) {
+        case SELECTION_VALID:
+            return input;
+        case SELECTION_BACK:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+        case SELECTION_INVALID:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+        }
     }
 }
 
@@ -80,47 +80,63 @@ void open_inventory(const character party[], const size_t party_size) {
     }
 
     while (true) {
-    render_party(party, party_size);
-    input_status = clean_input_int(&input, 1);
-    switch (validate_input(&input, input_status, party_size)) {
-    case SELECTION_VALID:
-        print_inventory(party[input].inventory, party[input].inventory_size);
-        return;
-    case SELECTION_BACK:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-    case SELECTION_INVALID:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-        ;}
+        render_party(party, party_size);
+        input_status = clean_input_int(&input, 1);
+        switch (validate_input(&input, input_status, party_size)) {
+        case SELECTION_VALID:
+            print_inventory(party[input].inventory,
+                            party[input].inventory_size);
+            return;
+        case SELECTION_BACK:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+        case SELECTION_INVALID:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+            ;
+        }
     }
 }
 
-void add_inventory (character party[], size_t party_size) {
+void add_inventory(character party[], size_t party_size) {
     int input;
     status input_status;
     item_id item_id;
-    
+
     if (party_size <= 0) {
         read_status(STATUS_EMPTY);
         return;
     }
 
     while (true) {
-    render_party(party, party_size);
-    input_status = clean_input_int(&input, 1);
-    switch (validate_input(&input, input_status, party_size)) {
-    case SELECTION_VALID:
-        item_id = select_item();
-        add_item(item_id, party[input].inventory, &party[input].inventory_size);
-        return;
-    case SELECTION_BACK:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-    case SELECTION_INVALID:
-        read_status(STATUS_INVALID_OPTION);
-        break;
-        ;}
+        render_party(party, party_size);
+        input_status = clean_input_int(&input, 1);
+        switch (validate_input(&input, input_status, party_size)) {
+        case SELECTION_VALID:
+            item_id = select_item();
+            add_item(item_id, party[input].inventory,
+                     &party[input].inventory_size);
+            return;
+        case SELECTION_BACK:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+        case SELECTION_INVALID:
+            read_status(STATUS_INVALID_OPTION);
+            break;
+            ;
+        }
     }
 }
 
+/* void remove_inventory(character party[], size_t party_size) {
+    int input;
+    status input_status;
+    item_id item_id;
+
+    if (party_size <= 0) {
+        return_status(STATUS_EMPTY);
+    }
+
+    while (true) {
+    render_party(iparty
+    }  */
