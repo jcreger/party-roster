@@ -1,15 +1,17 @@
 #include "input.h"
 #include "render.h"
 #include "types.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
 #include <strings.h>
 #endif
 
-struct stats stats_table[JOB_COUNT] = {
+stats stats_table[JOB_COUNT] = {
 
     [JOB_FIGHTER] = {.strength = 20,
                      .agility = 10,
@@ -64,15 +66,15 @@ int string_case_compare(char str1[], char str2[]) {
 }
 
 // Helper swap function for bubble sort
-void struct_swap(struct character *a, struct character *b) {
-    struct character temp = *a;
+void struct_swap(character *a, character *b) {
+    character temp = *a;
     *a = *b;
     *b = temp;
 }
 
 // Bubble sort that handles type and order
-void array_sort(struct character party[], size_t array_size, enum sort sort_id,
-                enum order order_id) {
+void array_sort(character party[], size_t array_size, sort sort_id,
+                order order_id) {
     for (size_t i = 0; i < array_size; i++) {
         bool swapped = false;
         for (size_t j = 0; j < array_size - i - 1; j++) {
@@ -159,9 +161,9 @@ void array_sort(struct character party[], size_t array_size, enum sort sort_id,
 }
 
 // Allows the user to enter and assign a name to a character
-static void add_name(struct character *character) {
+static void add_name(character *character) {
     char name[LEN_NAME_CHARACTER];
-    enum status name_status;
+    status name_status;
     while (true) {
         clear_terminal();
         printf("Name: ");
@@ -176,8 +178,8 @@ static void add_name(struct character *character) {
 }
 
 // Allows the user to select and assign a job to a character
-static void add_job(struct character *character) {
-    enum status job_status;
+static void add_job(character *character) {
+    status job_status;
     int job_id;
     while (true) {
         clear_terminal();
@@ -203,7 +205,7 @@ static void add_job(struct character *character) {
 }
 
 // Creates a new character struct in party
-void add_character(struct character party[], size_t *party_size) {
+void add_character(character party[], size_t *party_size) {
     int index = *party_size;
     if (*party_size < MAX_PARTY) {
         add_name(&party[index]);
@@ -218,8 +220,8 @@ void add_character(struct character party[], size_t *party_size) {
 
 // Removes a character from the party array by shifting values to the left then
 // setting the memory to 0
-void remove_character(struct character party[], size_t *party_size) {
-    enum status input_status;
+void remove_character(character party[], size_t *party_size) {
+    status input_status;
     int input;
     size_t back = *party_size;
     if (*party_size > 0) {
@@ -234,7 +236,7 @@ void remove_character(struct character party[], size_t *party_size) {
                         party[i] = party[i + 1];
                     }
                     memset(&party[*party_size - 1], '\0',
-                           sizeof(struct character));
+                           sizeof(character));
                     (*party_size)--;
                     if (*party_size == 0) {
                         return;
@@ -255,9 +257,9 @@ void remove_character(struct character party[], size_t *party_size) {
 }
 
 // Opens menu to select invididual characters and view their name, job, stats
-void view_character(const struct character party[], size_t party_size) {
+void view_character(const character party[], size_t party_size) {
     int input;
-    enum status input_status;
+    status input_status;
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
@@ -279,9 +281,9 @@ void view_character(const struct character party[], size_t party_size) {
 }
 
 // Allows the user to swap the job of a party member
-void change_character(struct character party[], const size_t party_size) {
+void change_character(character party[], const size_t party_size) {
     int input;
-    enum status input_status;
+    status input_status;
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
@@ -304,8 +306,8 @@ void change_character(struct character party[], const size_t party_size) {
 }
 
 // Opens a menu that allows the user to select a sort method then order
-void sort_character(struct character party[], size_t party_size) {
-    enum status sort_status, order_status;
+void sort_character(character party[], size_t party_size) {
+    status sort_status, order_status;
     int sort, order;
     if (party_size > 0) {
         while (true) {

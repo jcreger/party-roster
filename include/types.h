@@ -3,28 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-enum item_type {
-    TYPE_WEAPON,
-    TYPE_ARMOR,
-    TYPE_RECOVERY,
-    TYPE_QUEST,
-};
-
-enum item {
-    ITEM_SWORD_COPPER,
-    ITEM_CHEST_LEATHER,
-    ITEM_POTION,
-    ITEM_KEY,
-};
-
-enum armor_slot {
-    SLOT_HEAD,
-    SLOT_CHEST,
-    SLOT_LEG,
-    SLOT_GLOVE,
-    SLOT_BOOT,
-};
 enum {
     LEN_NAME_CHARACTER = 16,
     LEN_NAME_ITEM = 32,
@@ -33,7 +13,30 @@ enum {
     MAX_INVENTORY = 50,
 };
 
-enum job {
+typedef enum {
+    TYPE_WEAPON,
+    TYPE_ARMOR,
+    TYPE_RECOVERY,
+    TYPE_QUEST,
+} item_type;
+
+typedef enum {
+    ITEM_SWORD_COPPER,
+    ITEM_CHEST_LEATHER,
+    ITEM_POTION,
+    ITEM_KEY,
+    ITEM_COUNT,
+} item_id;
+
+typedef enum {
+    SLOT_HEAD,
+    SLOT_CHEST,
+    SLOT_LEG,
+    SLOT_GLOVE,
+    SLOT_BOOT,
+} armor_slot;
+
+typedef enum {
     JOB_FIGHTER,
     JOB_THIEF,
     JOB_MAGE,
@@ -41,8 +44,9 @@ enum job {
     JOB_PALADIN,
     JOB_ASSASSIN,
     JOB_COUNT
-};
-enum status {
+} job;
+
+typedef enum {
     STATUS_OKAY,
     STATUS_NOT_FOUND,
     STATUS_INVALID_INPUT,
@@ -50,22 +54,25 @@ enum status {
     STATUS_LONG_INPUT,
     STATUS_LIST_FULL,
     STATUS_EMPTY,
-    STATUS_INVALID_OPTION
-};
+    STATUS_INVALID_OPTION,
+    STATUS_INV_EMPTY,
+} status;
 
-enum selection { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID };
+typedef enum { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID } selection;
 
-enum menu_option {
+typedef enum {
     MENU_ADD,
     MENU_VIEW,
     MENU_CHANGE,
     MENU_REMOVE,
     MENU_SORT,
+    MENU_INVENTORY,
+    MENU_ITEM_ADD,
     MENU_QUIT,
     MENU_COUNT,
-};
+} menu_option;
 
-enum sort {
+typedef enum {
     SORT_NAME,
     SORT_STRENGTH,
     SORT_AGILITY,
@@ -74,54 +81,57 @@ enum sort {
     SORT_RESILIENCE,
     SORT_SPIRIT,
     SORT_COUNT
-};
+} sort;
 
-enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT };
+typedef enum { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT } order;
 
-struct weapon_data {
+typedef enum { PARTY_1, PARTY_2, PARTY_3, PARTY_4 } party_id;
+
+typedef struct {
     int attack_power;
     int attack_speed;
-};
+} weapon_data;
 
-struct armor_data {
+typedef struct {
     int defense;
-    enum armor_slot slot;
-};
+    armor_slot slot;
+} armor_data;
 
-struct recovery_data {
+typedef struct {
     int heal_amount;
-};
-struct quest_data {
-    int quest_id;
-};
+} recovery_data ;
 
-struct item_definition {
+typedef struct {
+    int quest_id;
+} quest_data;
+
+typedef struct {
     char name[LEN_NAME_ITEM];
     int value;
-    enum item_type type;
+    item_type type;
     union data {
-        struct weapon_data weapon;
-        struct armor_data armor;
-        struct recovery_data recovery;
-        struct quest_data quest;
+        weapon_data weapon;
+        armor_data armor;
+        recovery_data recovery;
+        quest_data quest;
     } data;
-};
+} item_definition; 
 
-struct item_instance {
+typedef struct {
     uint8_t item_id;
     uint8_t quantity;
-};
+} item_instance; 
 
-struct equipment {
+typedef struct {
     int weapon;
     int head;
     int torso;
     int leg;
     int arm;
     int boot;
-};
+} equipment; 
 
-struct stats {
+typedef struct {
     uint8_t strength;
     uint8_t agility;
     uint8_t intelligence;
@@ -132,15 +142,15 @@ struct stats {
     int attack_power;
     int defense;
     int attack_speed;
-};
+} stats;
 
-struct character {
+typedef struct {
     char name[LEN_NAME_CHARACTER];
-    enum job job;
-    struct stats stats;
-    struct item_instance inventory[MAX_INVENTORY];
+    job job;
+    stats stats;
+    item_instance inventory[MAX_INVENTORY];
     size_t inventory_size;
-    struct equipment equipment;
-};
+    equipment equipment;
+} character;
 
 #endif

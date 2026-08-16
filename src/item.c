@@ -1,10 +1,12 @@
-#include "render.h"
 #include "types.h"
+#include "input.h"
+#include "render.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
-struct item_definition item_table[MAX_ITEM] = {
+item_definition item_table[MAX_ITEM] = {
     [ITEM_SWORD_COPPER] = {.name = "Copper Sword",
                            .value = 50,
                            .type = TYPE_WEAPON,
@@ -27,31 +29,7 @@ struct item_definition item_table[MAX_ITEM] = {
                   .type = TYPE_QUEST,
                   .data.quest.quest_id = 0}};
 
-void print_item(const struct item_definition *item) {
-    printf("NAME: %s\nTYPE: %s\nVALUE: %d\n", item->name,
-           get_type_string(item->type), item->value);
-    switch (item->type) {
-    case TYPE_WEAPON:
-        printf("DAMAGE: %d\nATKSPD: %d\n", item->data.weapon.attack_power,
-               item->data.weapon.attack_speed);
-        break;
-    case TYPE_ARMOR:
-        printf("DEFENSE: %d\nSLOT: %s\n", item->data.armor.defense,
-               get_slot_string(item->data.armor.slot));
-        break;
-    case TYPE_RECOVERY:
-        printf("HEAL: %d\n", item->data.recovery.heal_amount);
-        break;
-    case TYPE_QUEST:
-        printf("ID: %d\n", item->data.quest.quest_id);
-        break;
-    default:
-        printf("ITEM UNDEFINED\n");
-        break;
-    }
-}
-
-void add_item(enum item item_id, struct item_instance inventory[],
+void add_item(item_id item_id, item_instance inventory[],
               size_t *inventory_size) {
     if (*inventory_size >= MAX_INVENTORY) {
         return;
@@ -70,7 +48,27 @@ void add_item(enum item item_id, struct item_instance inventory[],
     return;
 }
 
-void remove_item(enum item item_id, struct item_instance inventory[],
+item_id select_item(void) {
+    int input;
+    status input_status;
+    
+    while (true) {
+    render_item_table();
+    input_status = clean_input_int(&input, 1);
+    switch (validate_input(&input, input_status, ITEM_COUNT)) {
+    case SELECTION_VALID:
+        return input;
+    case SELECTION_BACK:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+    case SELECTION_INVALID:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+    }
+    }
+}
+
+void remove_item(item_id item_id, item_instance inventory[],
                  size_t *inventory_size) {
     if (*inventory_size == 0) {
         return;
@@ -84,7 +82,7 @@ void remove_item(enum item item_id, struct item_instance inventory[],
                     inventory[j] = inventory[j + 1];
                 }
                 memset(&inventory[*inventory_size - 1], '\0',
-                       sizeof(struct item_instance));
+                       sizeof(item_instance));
                 (*inventory_size)--;
                 i--;
             }
@@ -95,10 +93,57 @@ void remove_item(enum item item_id, struct item_instance inventory[],
     return;
 }
 
-void print_item_instance(const struct character *character) {
-    for (size_t i = 0; i < character->inventory_size; i++) {
-        print_item(&item_table[character->inventory[i].item_id]);
-        printf("ITEM_ID: %d\nQUANT: %d\n\n", character->inventory[i].item_id,
-               character->inventory[i].quantity);
+void open_inventory(const character party[], const size_t party_size) {
+    int input;
+    status input_status;
+
+    if (party_size <= 0) {
+        read_status(STATUS_EMPTY);
+        return;
+    }
+
+    while (true) {
+    render_party(party, party_size);
+    input_status = clean_input_int(&input, 1);
+    switch (validate_input(&input, input_status, party_size)) {
+    case SELECTION_VALID:
+        print_inventory(party[input].inventory, party[input].inventory_size);
+        return;
+    case SELECTION_BACK:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+    case SELECTION_INVALID:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+        ;}
     }
 }
+
+void add_inventory (character party[], size_t party_size) {
+    int input;
+    status input_status;
+    item_id item_id;
+    
+    if (party_size <= 0) {
+        read_status(STATUS_EMPTY);
+        return;
+    }
+
+    while (true) {
+    render_party(party, party_size);
+    input_status = clean_input_int(&input, 1);
+    switch (validate_input(&input, input_status, party_size)) {
+    case SELECTION_VALID:
+        item_id = select_item();
+        add_item(item_id, party[input].inventory, &party[input].inventory_size);
+        return;
+    case SELECTION_BACK:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+    case SELECTION_INVALID:
+        read_status(STATUS_INVALID_OPTION);
+        break;
+        ;}
+    }
+}
+

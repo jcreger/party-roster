@@ -1,5 +1,6 @@
 #include "render.h"
 #include "types.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +41,7 @@ int clean_input(char string[], const size_t string_size) {
 }
 
 // Cleans user input and converts string to integer return status
-enum status clean_input_int(int *num, int digit_count) {
+status clean_input_int(int *num, int digit_count) {
     char string[digit_count + 1];
     size_t string_size = sizeof(string);
     *num = 0;
@@ -71,7 +72,7 @@ enum status clean_input_int(int *num, int digit_count) {
 
 // Validates integer input of a user works for a menu and returns codes for the
 // selection
-enum selection validate_input(int *input, const enum status input_status,
+selection validate_input(int *input, const status input_status,
                               const size_t size) {
     if (input_status != STATUS_OKAY) {
         read_status(input_status);
