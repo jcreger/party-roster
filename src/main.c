@@ -10,6 +10,7 @@ int main(void) {
     struct character party[MAX_PARTY];
     size_t party_size = 0;
     static bool running = true;
+
     while (running) {
         enum menu_option user_input = render_menu(party_size);
         switch (user_input) {

@@ -1,10 +1,10 @@
 #include "render.h"
 #include "types.h"
+
 #include <stdio.h>
 #include <string.h>
 
 struct item_definition item_table[MAX_ITEM] = {
-
     [ITEM_SWORD_COPPER] = {.name = "Copper Sword",
                            .value = 50,
                            .type = TYPE_WEAPON,
@@ -46,7 +46,7 @@ void print_item(const struct item_definition *item) {
         printf("ID: %d\n", item->data.quest.quest_id);
         break;
     default:
-        printf("ITEM UNDEFINED");
+        printf("ITEM UNDEFINED\n");
         break;
     }
 }
@@ -56,12 +56,14 @@ void add_item(enum item item_id, struct item_instance inventory[],
     if (*inventory_size >= MAX_INVENTORY) {
         return;
     }
+
     for (size_t i = 0; i < *inventory_size; i++) {
         if (inventory[i].item_id == item_id) {
             inventory[i].quantity++;
             return;
         }
     }
+
     inventory[*inventory_size].item_id = item_id;
     inventory[*inventory_size].quantity = 1;
     (*inventory_size)++;
@@ -73,6 +75,7 @@ void remove_item(enum item item_id, struct item_instance inventory[],
     if (*inventory_size == 0) {
         return;
     }
+
     for (size_t i = 0; i < *inventory_size; i++) {
         if (inventory[i].item_id == item_id) {
             inventory[i].quantity--;
@@ -88,6 +91,7 @@ void remove_item(enum item item_id, struct item_instance inventory[],
             return;
         }
     }
+
     return;
 }
 
