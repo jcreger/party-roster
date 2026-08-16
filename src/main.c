@@ -35,6 +35,9 @@ int main(void) {
         case MENU_ITEM_ADD:
             add_inventory(party, party_size);
             break;
+        case MENU_ITEM_REMOVE:
+            remove_inventory(party, party_size);
+            break;
         case MENU_QUIT:
             running = false;
             clear_terminal();

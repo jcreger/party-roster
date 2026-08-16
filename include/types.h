@@ -57,6 +57,7 @@ typedef enum {
     STATUS_INVALID_OPTION,
     STATUS_INV_EMPTY,
     STATUS_Q,
+    STATUS_INV_FULL,
 } status;
 
 typedef enum { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID } selection;
@@ -69,6 +70,7 @@ typedef enum {
     MENU_SORT,
     MENU_INVENTORY,
     MENU_ITEM_ADD,
+    MENU_ITEM_REMOVE,
     MENU_QUIT,
     MENU_COUNT,
 } menu_option;

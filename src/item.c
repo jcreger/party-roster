@@ -9,6 +9,7 @@
 void add_item(item_id item_id, item_instance inventory[],
               size_t *inventory_size) {
     if (*inventory_size >= MAX_INVENTORY) {
+        read_status(STATUS_INV_FULL);
         return;
     }
 
@@ -48,6 +49,7 @@ item_id select_item(void) {
 void remove_item(item_id item_id, item_instance inventory[],
                  size_t *inventory_size) {
     if (*inventory_size == 0) {
+        read_status(STATUS_INV_EMPTY);
         return;
     }
 
@@ -128,15 +130,60 @@ void add_inventory(character party[], size_t party_size) {
     }
 }
 
-/* void remove_inventory(character party[], size_t party_size) {
+item_id select_remove_item(const item_instance inventory[],
+                           const size_t inventory_size) {
+    int input;
+    status input_status;
+
+    if (inventory_size <= 0) {
+        read_status(STATUS_INV_EMPTY);
+        return -1;
+    }
+
+    while (true) {
+        render_inventory_name(inventory, inventory_size);
+        input_status = clean_input_int(&input, 1);
+        switch (validate_input(&input, input_status, inventory_size)) {
+        case SELECTION_VALID:
+            return inventory[input].item_id;
+        case SELECTION_BACK:
+            break;
+        case SELECTION_INVALID:
+            break;
+        }
+    }
+}
+
+void remove_inventory(character party[], size_t party_size) {
     int input;
     status input_status;
     item_id item_id;
 
     if (party_size <= 0) {
-        return_status(STATUS_EMPTY);
+        read_status(STATUS_EMPTY);
+        return;
     }
 
     while (true) {
-    render_party(iparty
-    }  */
+        render_party(party, party_size);
+        input_status = clean_input_int(&input, 1);
+        switch (validate_input(&input, input_status, party_size)) {
+        case SELECTION_VALID:
+            if (party[input].inventory_size <= 0) {
+                read_status(STATUS_INV_EMPTY);
+                return;
+            }
+
+            item_id = select_remove_item(party[input].inventory,
+                                         party[input].inventory_size);
+            remove_item(item_id, party[input].inventory,
+                        &party[input].inventory_size);
+            return;
+        case SELECTION_BACK:
+            break;
+        case SELECTION_INVALID:
+            break;
+            ;
+        }
+    }
+}

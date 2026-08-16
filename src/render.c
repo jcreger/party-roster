@@ -43,6 +43,8 @@ const char *get_menu_string(const menu_option option_id) {
         return "Open inventory";
     case MENU_ITEM_ADD:
         return "Add item";
+    case MENU_ITEM_REMOVE:
+        return "Remove item";
     case MENU_QUIT:
         return "Quit";
     default:
@@ -155,6 +157,9 @@ void read_status(status status_id) {
         break;
     case STATUS_Q:
         printf("Q is selected");
+        break;
+    case STATUS_INV_FULL:
+        printf("Inventory is full");
         break;
     default:
         break;
@@ -274,5 +279,18 @@ void render_item_table(void) {
     clear_terminal();
     for (int i = 0; i < ITEM_COUNT; i++) {
         printf("%d| %s\n", i + 1, item_table[i].name);
+    }
+}
+
+void render_inventory_name(const item_instance inventory[],
+                           const size_t inventory_size) {
+    clear_terminal();
+    if (inventory_size <= 0) {
+        read_status(STATUS_INV_EMPTY);
+        return;
+    }
+
+    for (size_t i = 0; i < inventory_size; i++) {
+        printf("%zu| %s\n", i + 1, item_table[inventory[i].item_id].name);
     }
 }

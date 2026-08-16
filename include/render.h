@@ -23,6 +23,8 @@ void render_party_character(const character character);
 void render_sort();
 void render_order();
 void render_item_table(void);
+void render_inventory_name(const item_instance inventory[],
+                           const size_t inventory_size);
 
 void read_status(status status_id);
 
