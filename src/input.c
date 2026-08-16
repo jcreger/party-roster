@@ -59,6 +59,9 @@ status clean_input_int(int *num, int digit_count) {
     } else {
         string[strcspn(string, "\n")] = '\0';
     }
+    if (string[0] == 'q' && string[1] == '\0') {
+        return STATUS_Q;
+    }
     if (string[0] == '0' && string[1] == '\0') {
         *num = atoi(string);
         return STATUS_OKAY;
@@ -74,6 +77,9 @@ status clean_input_int(int *num, int digit_count) {
 // selection
 selection validate_input(int *input, const status input_status,
                               const size_t size) {
+    if (input_status == STATUS_Q) {
+        return SELECTION_BACK;
+    }
     if (input_status != STATUS_OKAY) {
         read_status(input_status);
         return SELECTION_INVALID;
@@ -86,15 +92,12 @@ selection validate_input(int *input, const status input_status,
     if (*input >= 0 && (size_t)*input < size) {
         return SELECTION_VALID;
     }
-    if (*input >= 0 && (size_t)*input == size) {
-        return SELECTION_BACK;
-    }
     read_status(STATUS_INVALID_OPTION);
     return SELECTION_INVALID;
 }
 
 // Waits until user inputs anything to continue
-void wait_enter() {
+void wait_enter(void) {
     char input;
     printf("\npress enter to continue...");
     clean_input(&input, sizeof(input));

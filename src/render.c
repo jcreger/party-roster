@@ -1,5 +1,4 @@
 #include "input.h"
-#include "item.h"
 #include "types.h"
 
 #include <inttypes.h>
@@ -153,6 +152,10 @@ void read_status(status status_id) {
         break;
     case STATUS_INV_EMPTY:
         printf("Inventory is empty");
+        break;
+    case STATUS_Q:
+        printf("Q is selected");
+        break;
     default:
         break;
     }
@@ -168,8 +171,8 @@ void render_party(const character party[], size_t party_size) {
 }
 
 // Renders the quit menu
-void render_back(const size_t count) {
-    printf("\n%zu| Back\n\n", count + 1);
+void render_back(void) {
+    printf("\nq| Back\n\n");
     printf("> ");
 }
 
@@ -183,12 +186,13 @@ menu_option render_menu(const size_t party_size) {
         for (int i = 0; i < MENU_COUNT - 1; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
-        printf("\n%d| Quit\n\n> ", MENU_COUNT);
+        printf("\nq| Quit\n\n> ");
         input_status = clean_input_int(&input, 1);
-        switch (validate_input(&input, input_status, MENU_COUNT)) {
+        switch (validate_input(&input, input_status, MENU_COUNT - 1)) {
         case SELECTION_VALID:
             return input;
         case SELECTION_BACK:
+            return MENU_COUNT;
             read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:

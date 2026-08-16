@@ -17,7 +17,7 @@ void print_inventory(const item_instance inventory[], const size_t inventory_siz
 menu_option render_menu(const size_t party_size);
 
 void render_party(const character party[], size_t party_size);
-void render_back(const size_t count);
+void render_back(void);
 void render_party_character(const character character);
 void render_sort();
 void render_order();

@@ -56,6 +56,7 @@ typedef enum {
     STATUS_EMPTY,
     STATUS_INVALID_OPTION,
     STATUS_INV_EMPTY,
+    STATUS_Q,
 } status;
 
 typedef enum { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID } selection;

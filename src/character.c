@@ -178,13 +178,12 @@ void add_character(character party[], size_t *party_size) {
 void remove_character(character party[], size_t *party_size) {
     status input_status;
     int input;
-    size_t back = *party_size;
     if (*party_size > 0) {
         while (true) {
             render_party(party, *party_size);
-            render_back(back);
+            render_back();
             input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, back)) {
+            switch (validate_input(&input, input_status, *party_size)) {
             case SELECTION_VALID:
                 if (input >= 0 && (size_t)input < *party_size) {
                     for (size_t i = input; i < *party_size - 1; i++) {
@@ -218,7 +217,7 @@ void view_character(const character party[], size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
-            render_back(party_size);
+            render_back();
             input_status = clean_input_int(&input, 1);
             switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
@@ -242,7 +241,7 @@ void change_character(character party[], const size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_party(party, party_size);
-            render_back(party_size);
+            render_back();
             input_status = clean_input_int(&input, 1);
             switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
@@ -267,7 +266,7 @@ void sort_character(character party[], size_t party_size) {
     if (party_size > 0) {
         while (true) {
             render_sort();
-            render_back(SORT_COUNT);
+            render_back();
             sort_status = clean_input_int(&sort, 1);
             switch (validate_input(&sort, sort_status, SORT_COUNT)) {
             case SELECTION_VALID:
