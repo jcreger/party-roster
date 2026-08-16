@@ -4,8 +4,6 @@
 #include "types.h"
 #include <stddef.h>
 
-extern stats stats_table[JOB_COUNT];
-
 void add_character(character party[], size_t *party_size);
 void remove_character(character party[], size_t *party_size);
 void view_character(const character party[], size_t party_size);

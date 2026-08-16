@@ -6,29 +6,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-item_definition item_table[MAX_ITEM] = {
-    [ITEM_SWORD_COPPER] = {.name = "Copper Sword",
-                           .value = 50,
-                           .type = TYPE_WEAPON,
-                           .data.weapon.attack_power = 10,
-                           .data.weapon.attack_speed = 1},
-
-    [ITEM_CHEST_LEATHER] = {.name = "Leather Chest",
-                            .value = 40,
-                            .type = TYPE_ARMOR,
-                            .data.armor.defense = 4,
-                            .data.armor.slot = SLOT_CHEST},
-
-    [ITEM_POTION] = {.name = "Potion",
-                     .value = 10,
-                     .type = TYPE_RECOVERY,
-                     .data.recovery.heal_amount = 20},
-
-    [ITEM_KEY] = {.name = "Key",
-                  .value = 0,
-                  .type = TYPE_QUEST,
-                  .data.quest.quest_id = 0}};
-
 void add_item(item_id item_id, item_instance inventory[],
               size_t *inventory_size) {
     if (*inventory_size >= MAX_INVENTORY) {

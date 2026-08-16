@@ -153,4 +153,7 @@ typedef struct {
     equipment equipment;
 } character;
 
+extern item_definition item_table[MAX_ITEM];
+extern stats stats_table[JOB_COUNT];
+
 #endif

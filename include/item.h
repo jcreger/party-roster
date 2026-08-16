@@ -11,6 +11,5 @@ void remove_item(item_id item_id, item_instance inventory[],
                  size_t *inventory_size);
 void open_inventory(const character party[], const size_t party_size);
 void add_inventory (character party[], size_t party_size);
-extern item_definition item_table[MAX_ITEM];
 
 #endif

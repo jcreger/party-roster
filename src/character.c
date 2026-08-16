@@ -11,51 +11,6 @@
 #include <strings.h>
 #endif
 
-stats stats_table[JOB_COUNT] = {
-
-    [JOB_FIGHTER] = {.strength = 20,
-                     .agility = 10,
-                     .intelligence = 5,
-                     .stamina = 15,
-                     .resilience = 10,
-                     .spirit = 5},
-
-    [JOB_THIEF] = {.strength = 10,
-                   .agility = 20,
-                   .intelligence = 5,
-                   .stamina = 10,
-                   .resilience = 15,
-                   .spirit = 5},
-
-    [JOB_MAGE] = {.strength = 5,
-                  .agility = 5,
-                  .intelligence = 20,
-                  .stamina = 10,
-                  .resilience = 10,
-                  .spirit = 15},
-
-    [JOB_ROGUE] = {.strength = 15,
-                   .agility = 20,
-                   .intelligence = 5,
-                   .stamina = 10,
-                   .resilience = 10,
-                   .spirit = 5},
-
-    [JOB_PALADIN] = {.strength = 15,
-                     .agility = 5,
-                     .intelligence = 10,
-                     .stamina = 15,
-                     .resilience = 10,
-                     .spirit = 10},
-
-    [JOB_ASSASSIN] = {.strength = 10,
-                      .agility = 15,
-                      .intelligence = 15,
-                      .stamina = 10,
-                      .resilience = 10,
-                      .spirit = 5},
-};
-
 int string_case_compare(char str1[], char str2[]) {
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
     return strcasecmp(str1, str2);
