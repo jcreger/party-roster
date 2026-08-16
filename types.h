@@ -28,9 +28,9 @@ enum armor_slot {
 enum {
     LEN_NAME_CHARACTER = 16,
     LEN_NAME_ITEM = 32,
-    SIZE_ITEM = 255,
-    SIZE_PARTY = 4,
-    SIZE_INVENTORY = 50,
+    MAX_ITEM = 255,
+    MAX_PARTY = 4,
+    MAX_INVENTORY = 50,
 };
 
 enum job {
@@ -138,7 +138,7 @@ struct character {
     char name[LEN_NAME_CHARACTER];
     enum job job;
     struct stats stats;
-    struct item_instance inventory[SIZE_INVENTORY];
+    struct item_instance inventory[MAX_INVENTORY];
     size_t inventory_size;
     struct equipment equipment;
 };

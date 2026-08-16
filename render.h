@@ -9,6 +9,7 @@ const char *get_menu_string(const enum menu_option option_id);
 const char *get_sort_string(const enum sort sort_id);
 const char *get_order_string(const enum order order_id);
 const char *get_slot_string(const enum armor_slot slot_id);
+const char *get_type_string(const enum item_type type_id);
 
 void render_party(const struct character party[], size_t party_size);
 void render_back(const size_t count);

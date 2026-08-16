@@ -1,7 +1,6 @@
 #include "render.h"
 #include "types.h"
 #include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +20,9 @@ int clean_input(char string[], const size_t string_size) {
     assert(string_size >= 1);
     if (fgets(string, string_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
+    }
+    if (string[0] == '\n') {
+        return STATUS_INVALID_INPUT;
     }
     if (strchr(string, '\n') == NULL) {
         int c = getchar();
@@ -70,7 +72,7 @@ enum status clean_input_int(int *num, int digit_count) {
 // Validates integer input of a user works for a menu and returns codes for the
 // selection
 enum selection validate_input(int *input, const enum status input_status,
-                              const size_t count, bool back) {
+                              const size_t size) {
     if (input_status != STATUS_OKAY) {
         read_status(input_status);
         return SELECTION_INVALID;
@@ -80,10 +82,10 @@ enum selection validate_input(int *input, const enum status input_status,
         return SELECTION_INVALID;
     }
     (*input)--;
-    if (*input >= 0 && (size_t)*input < count) {
+    if (*input >= 0 && (size_t)*input < size) {
         return SELECTION_VALID;
     }
-    if (back && *input >= 0 && (size_t)*input == count) {
+    if (*input >= 0 && (size_t)*input == size) {
         return SELECTION_BACK;
     }
     read_status(STATUS_INVALID_OPTION);

@@ -96,6 +96,21 @@ const char *get_slot_string(const enum armor_slot slot_id) {
     }
 }
 
+const char *get_type_string(const enum item_type type_id) {
+    switch (type_id) {
+    case TYPE_WEAPON:
+        return "WEAPON";
+    case TYPE_ARMOR:
+        return "ARMOR";
+    case TYPE_RECOVERY:
+        return "RECOVERY";
+    case TYPE_QUEST:
+        return "QUEST";
+    default:
+        return "TYPE UNDEFINED";
+    }
+}
+
 void clear_terminal() {
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
     system("clear");
@@ -156,16 +171,17 @@ enum menu_option render_menu(const size_t party_size) {
     enum status input_status;
     while (true) {
         clear_terminal();
-        printf("%zu/%d Characters\n\n", party_size, SIZE_PARTY);
+        printf("%zu/%d Characters\n\n", party_size, MAX_PARTY);
         for (int i = 0; i < MENU_COUNT - 1; i++) {
             printf("%d| %s\n", i + 1, get_menu_string(i));
         }
         printf("\n%d| Quit\n\n> ", MENU_COUNT);
         input_status = clean_input_int(&input, 1);
-        switch (validate_input(&input, input_status, MENU_COUNT, false)) {
+        switch (validate_input(&input, input_status, MENU_COUNT)) {
         case SELECTION_VALID:
             return input;
         case SELECTION_BACK:
+            read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:
             break;

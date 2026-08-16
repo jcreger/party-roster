@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 int main(void) {
-    struct character party[SIZE_PARTY];
+    struct character party[MAX_PARTY];
     size_t party_size = 0;
     static bool running = true;
     while (running) {
@@ -31,16 +31,18 @@ int main(void) {
         case MENU_QUIT:
             clear_terminal();
             if (party_size > 0) {
-                add_item(ITEM_SWORD_COPPER, &party[0]);
-                add_item(ITEM_SWORD_COPPER, &party[0]);
-                add_item(ITEM_SWORD_COPPER, &party[0]);
-                add_item(ITEM_CHEST_LEATHER, &party[0]);
-                add_item(ITEM_POTION, &party[0]);
-                add_item(ITEM_POTION, &party[0]);
-                add_item(ITEM_KEY, &party[0]);
-                add_item(ITEM_KEY, &party[0]);
-                add_item(ITEM_KEY, &party[0]);
-                add_item(ITEM_KEY, &party[0]);
+                struct item_instance *inv = party[0].inventory;
+                size_t *inv_size = &party[0].inventory_size;
+                add_item(ITEM_SWORD_COPPER, inv, inv_size);
+                add_item(ITEM_SWORD_COPPER, inv, inv_size);
+                add_item(ITEM_SWORD_COPPER, inv, inv_size);
+                add_item(ITEM_CHEST_LEATHER, inv, inv_size);
+                add_item(ITEM_POTION, inv, inv_size);
+                add_item(ITEM_POTION, inv, inv_size);
+                add_item(ITEM_KEY, inv, inv_size);
+                add_item(ITEM_KEY, inv, inv_size);
+                add_item(ITEM_KEY, inv, inv_size);
+                add_item(ITEM_KEY, inv, inv_size);
                 print_item_instance(&party[0]);
                 wait_enter();
                 clear_terminal();
