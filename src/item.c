@@ -1,5 +1,5 @@
 #include "input.h"
-#include "render.h"
+#include "print.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -31,16 +31,14 @@ item_id select_item(void) {
     status input_status;
 
     while (true) {
-        render_item_table();
+        print_item_table();
         input_status = clean_input_int(&input, 1);
         switch (validate_input(&input, input_status, ITEM_COUNT)) {
         case SELECTION_VALID:
             return input;
         case SELECTION_BACK:
-            read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:
-            read_status(STATUS_INVALID_OPTION);
             break;
         }
     }
@@ -72,7 +70,7 @@ void remove_item(item_id item_id, item_instance inventory[],
     return;
 }
 
-void open_inventory(const character party[], const size_t party_size) {
+void view_inventory(const character party[], const size_t party_size) {
     int input;
     status input_status;
 
@@ -82,18 +80,22 @@ void open_inventory(const character party[], const size_t party_size) {
     }
 
     while (true) {
-        render_party(party, party_size);
+        print_party(party, party_size);
         input_status = clean_input_int(&input, 1);
         switch (validate_input(&input, input_status, party_size)) {
         case SELECTION_VALID:
+            if (party[input].inventory_size <= 0) {
+                read_status(STATUS_INV_EMPTY);
+                return;
+            }
+
             print_inventory(party[input].inventory,
                             party[input].inventory_size);
+            wait_enter();
             return;
         case SELECTION_BACK:
-            read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:
-            read_status(STATUS_INVALID_OPTION);
             break;
             ;
         }
@@ -111,7 +113,7 @@ void add_inventory(character party[], size_t party_size) {
     }
 
     while (true) {
-        render_party(party, party_size);
+        print_party(party, party_size);
         input_status = clean_input_int(&input, 1);
         switch (validate_input(&input, input_status, party_size)) {
         case SELECTION_VALID:
@@ -120,10 +122,8 @@ void add_inventory(character party[], size_t party_size) {
                      &party[input].inventory_size);
             return;
         case SELECTION_BACK:
-            read_status(STATUS_INVALID_OPTION);
             break;
         case SELECTION_INVALID:
-            read_status(STATUS_INVALID_OPTION);
             break;
             ;
         }
@@ -141,7 +141,7 @@ item_id select_remove_item(const item_instance inventory[],
     }
 
     while (true) {
-        render_inventory_name(inventory, inventory_size);
+        print_inventory(inventory, inventory_size);
         input_status = clean_input_int(&input, 1);
         switch (validate_input(&input, input_status, inventory_size)) {
         case SELECTION_VALID:
@@ -165,7 +165,7 @@ void remove_inventory(character party[], size_t party_size) {
     }
 
     while (true) {
-        render_party(party, party_size);
+        print_party(party, party_size);
         input_status = clean_input_int(&input, 1);
         switch (validate_input(&input, input_status, party_size)) {
         case SELECTION_VALID:

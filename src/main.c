@@ -1,6 +1,6 @@
 #include "character.h"
 #include "item.h"
-#include "render.h"
+#include "print.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -12,7 +12,7 @@ int main(void) {
     static bool running = true;
 
     while (running) {
-        menu_option user_input = render_menu(party_size);
+        menu_option user_input = print_menu(party_size);
         switch (user_input) {
         case MENU_ADD:
             add_character(party, &party_size);
@@ -30,7 +30,7 @@ int main(void) {
             sort_character(party, party_size);
             break;
         case MENU_INVENTORY:
-            open_inventory(party, party_size);
+            view_inventory(party, party_size);
             break;
         case MENU_ITEM_ADD:
             add_inventory(party, party_size);

@@ -167,22 +167,22 @@ void read_status(status status_id) {
     wait_enter();
 }
 
-// Renders a menu for the entire party
-void render_party(const character party[], size_t party_size) {
+// prints a menu for the entire party
+void print_party(const character party[], size_t party_size) {
     clear_terminal();
     for (size_t i = 0; i < party_size; i++) {
         printf("%zu| %s\n", i + 1, party[i].name);
     }
 }
 
-// Renders the quit menu
-void render_back(void) {
+// prints the quit menu
+void print_back(void) {
     printf("\nq| Back\n\n");
     printf("> ");
 }
 
-// Render the main menu and return valid user input, returns the user input
-menu_option render_menu(const size_t party_size) {
+// print the main menu and return valid user input, returns the user input
+menu_option print_menu(const size_t party_size) {
     int input;
     status input_status;
     while (true) {
@@ -206,8 +206,8 @@ menu_option render_menu(const size_t party_size) {
     }
 }
 
-// Renders information of a character
-void render_party_character(const character character) {
+// prints information of a character
+void print_character(const character character) {
     clear_terminal();
     printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
            "\nIntelligence: %" PRIu8 "\nStamina: %" PRIu8
@@ -219,16 +219,16 @@ void render_party_character(const character character) {
     wait_enter();
 }
 
-// Renders the sorting menu
-void render_sort(void) {
+// prints the sorting menu
+void print_sort(void) {
     clear_terminal();
     for (int i = 0; i < SORT_COUNT; i++) {
         printf("%d| %s\n", i + 1, get_sort_string(i));
     }
 }
 
-// Renders the ordering menu
-void render_order(void) {
+// prints the ordering menu
+void print_order(void) {
     clear_terminal();
     for (int i = 0; i < ORDER_COUNT; i++) {
         printf("%d| %s\n", i + 1, get_order_string(i));
@@ -262,35 +262,15 @@ void print_item(const item_definition item) {
 void print_inventory(const item_instance inventory[],
                      const size_t inventory_size) {
     clear_terminal();
-    if (inventory_size <= 0) {
-        read_status(STATUS_INV_EMPTY);
-        return;
-    }
-
     for (size_t i = 0; i < inventory_size; i++) {
-        print_item(item_table[inventory[i].item_id]);
-        printf("ITEM_ID: %d\nQUANT: %d\n\n", inventory[i].item_id,
-               inventory[i].quantity);
+        printf("%zu | x%d | %s\n", i + 1, inventory[i].quantity,
+               item_table[inventory[i].item_id].name);
     }
-    wait_enter();
 }
 
-void render_item_table(void) {
+void print_item_table(void) {
     clear_terminal();
     for (int i = 0; i < ITEM_COUNT; i++) {
-        printf("%d| %s\n", i + 1, item_table[i].name);
-    }
-}
-
-void render_inventory_name(const item_instance inventory[],
-                           const size_t inventory_size) {
-    clear_terminal();
-    if (inventory_size <= 0) {
-        read_status(STATUS_INV_EMPTY);
-        return;
-    }
-
-    for (size_t i = 0; i < inventory_size; i++) {
-        printf("%zu| %s\n", i + 1, item_table[inventory[i].item_id].name);
+        printf("%d | %s\n", i + 1, item_table[i].name);
     }
 }

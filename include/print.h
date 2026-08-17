@@ -1,5 +1,5 @@
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef print_H
+#define print_H
 
 #include "types.h"
 #include <stddef.h>
@@ -12,19 +12,17 @@ const char *get_slot_string(const armor_slot slot_id);
 const char *get_type_string(const item_type type_id);
 
 void print_item(const item_definition item);
+
+menu_option print_menu(const size_t party_size);
+
+void print_party(const character party[], size_t party_size);
+void print_back(void);
+void print_character(const character character);
+void print_sort();
+void print_order();
 void print_inventory(const item_instance inventory[],
                      const size_t inventory_size);
-
-menu_option render_menu(const size_t party_size);
-
-void render_party(const character party[], size_t party_size);
-void render_back(void);
-void render_party_character(const character character);
-void render_sort();
-void render_order();
-void render_item_table(void);
-void render_inventory_name(const item_instance inventory[],
-                           const size_t inventory_size);
+void print_item_table(void);
 
 void read_status(status status_id);
 

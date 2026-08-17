@@ -1,5 +1,5 @@
 #include "input.h"
-#include "render.h"
+#include "print.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -167,7 +167,7 @@ void add_character(character party[], size_t *party_size) {
         add_job(&party[index]);
         party[index].inventory_size = 0;
         (*party_size)++;
-        render_party_character(party[index]);
+        print_character(party[index]);
     } else {
         read_status(STATUS_LIST_FULL);
     }
@@ -180,8 +180,8 @@ void remove_character(character party[], size_t *party_size) {
     int input;
     if (*party_size > 0) {
         while (true) {
-            render_party(party, *party_size);
-            render_back();
+            print_party(party, *party_size);
+            print_back();
             input_status = clean_input_int(&input, 1);
             switch (validate_input(&input, input_status, *party_size)) {
             case SELECTION_VALID:
@@ -215,12 +215,12 @@ void view_character(const character party[], size_t party_size) {
     status input_status;
     if (party_size > 0) {
         while (true) {
-            render_party(party, party_size);
-            render_back();
+            print_party(party, party_size);
+            print_back();
             input_status = clean_input_int(&input, 1);
             switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
-                render_party_character(party[input]);
+                print_character(party[input]);
                 break;
             case SELECTION_BACK:
                 return;
@@ -239,13 +239,13 @@ void change_character(character party[], const size_t party_size) {
     status input_status;
     if (party_size > 0) {
         while (true) {
-            render_party(party, party_size);
-            render_back();
+            print_party(party, party_size);
+            print_back();
             input_status = clean_input_int(&input, 1);
             switch (validate_input(&input, input_status, party_size)) {
             case SELECTION_VALID:
                 add_job(&party[input]);
-                render_party_character(party[input]);
+                print_character(party[input]);
                 break;
             case SELECTION_BACK:
                 return;
@@ -264,19 +264,19 @@ void sort_character(character party[], size_t party_size) {
     int sort, order;
     if (party_size > 0) {
         while (true) {
-            render_sort();
-            render_back();
+            print_sort();
+            print_back();
             sort_status = clean_input_int(&sort, 1);
             switch (validate_input(&sort, sort_status, SORT_COUNT)) {
             case SELECTION_VALID:
                 while (true) {
-                    render_order();
+                    print_order();
                     printf("\n> ");
                     order_status = clean_input_int(&order, 1);
                     switch (validate_input(&order, order_status, ORDER_COUNT)) {
                     case SELECTION_VALID:
                         array_sort(party, party_size, sort, order);
-                        render_party(party, party_size);
+                        print_party(party, party_size);
                         wait_enter();
                         return;
                     case SELECTION_BACK:
