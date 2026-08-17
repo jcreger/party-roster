@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 enum {
     LEN_NAME_CHARACTER = 16,
@@ -11,32 +10,34 @@ enum {
     MAX_ITEM = 255,
     MAX_PARTY = 4,
     MAX_INVENTORY = 50,
+    MAX_INPUT = 9,
 };
 
-typedef enum {
+typedef enum item_type {
     TYPE_WEAPON,
     TYPE_ARMOR,
     TYPE_RECOVERY,
     TYPE_QUEST,
-} item_type;
+} item_type_e;
 
-typedef enum {
+typedef enum item {
+    ITEM_INVALID = -1,
     ITEM_SWORD_COPPER,
     ITEM_CHEST_LEATHER,
     ITEM_POTION,
     ITEM_KEY,
     ITEM_COUNT,
-} item_id;
+} item_e;
 
-typedef enum {
+typedef enum armor_slot {
     SLOT_HEAD,
     SLOT_CHEST,
-    SLOT_LEG,
-    SLOT_GLOVE,
-    SLOT_BOOT,
-} armor_slot;
+    SLOT_LEGS,
+    SLOT_HANDS,
+    SLOT_FEET,
+} armor_slot_e;
 
-typedef enum {
+typedef enum job {
     JOB_FIGHTER,
     JOB_THIEF,
     JOB_MAGE,
@@ -44,25 +45,25 @@ typedef enum {
     JOB_PALADIN,
     JOB_ASSASSIN,
     JOB_COUNT
-} job;
+} job_e;
 
-typedef enum {
-    STATUS_OKAY,
+typedef enum status {
+    STATUS_OK,
     STATUS_NOT_FOUND,
     STATUS_INVALID_INPUT,
     STATUS_NULL_INPUT,
     STATUS_LONG_INPUT,
-    STATUS_LIST_FULL,
-    STATUS_EMPTY,
+    STATUS_PARTY_FULL,
+    STATUS_PARTY_EMPTY,
     STATUS_INVALID_OPTION,
-    STATUS_INV_EMPTY,
+    STATUS_INVENTORY_EMPTY,
     STATUS_Q,
-    STATUS_INV_FULL,
-} status;
+    STATUS_INVENTORY_FULL,
+} status_e;
 
-typedef enum { SELECTION_VALID, SELECTION_BACK, SELECTION_INVALID } selection;
+typedef enum input { INPUT_VALID, INPUT_Q, INPUT_ERROR } input_e;
 
-typedef enum {
+typedef enum menu_main {
     MENU_ADD,
     MENU_VIEW,
     MENU_CHANGE,
@@ -73,9 +74,9 @@ typedef enum {
     MENU_ITEM_REMOVE,
     MENU_QUIT,
     MENU_COUNT,
-} menu_option;
+} menu_main_e;
 
-typedef enum {
+typedef enum sort {
     SORT_NAME,
     SORT_STRENGTH,
     SORT_AGILITY,
@@ -84,57 +85,57 @@ typedef enum {
     SORT_RESILIENCE,
     SORT_SPIRIT,
     SORT_COUNT
-} sort;
+} sort_e;
 
-typedef enum { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT } order;
+typedef enum order { ORDER_ASCENDING, ORDER_DESCENDING, ORDER_COUNT } order_e;
 
-typedef enum { PARTY_1, PARTY_2, PARTY_3, PARTY_4 } party_id;
+typedef enum party { PARTY_1, PARTY_2, PARTY_3, PARTY_4 } party_e;
 
-typedef struct {
+typedef struct weapon_data {
     int attack_power;
     int attack_speed;
-} weapon_data;
+} weapon_data_s;
 
-typedef struct {
+typedef struct armor_data {
     int defense;
-    armor_slot slot;
-} armor_data;
+    armor_slot_e slot;
+} armor_data_s;
 
-typedef struct {
+typedef struct healing_data {
     int heal_amount;
-} recovery_data;
+} healing_data_s;
 
-typedef struct {
+typedef struct quest_data {
     int quest_id;
-} quest_data;
+} quest_data_s;
 
-typedef struct {
+typedef struct item_defintion {
     char name[LEN_NAME_ITEM];
     int value;
-    item_type type;
+    item_type_e type;
     union data {
-        weapon_data weapon;
-        armor_data armor;
-        recovery_data recovery;
-        quest_data quest;
+        weapon_data_s weapon;
+        armor_data_s armor;
+        healing_data_s healing;
+        quest_data_s quest;
     } data;
-} item_definition;
+} item_definition_s;
 
-typedef struct {
-    uint8_t item_id;
+typedef struct item_instance {
+    uint8_t item;
     uint8_t quantity;
-} item_instance;
+} item_instance_s;
 
-typedef struct {
+typedef struct equipment {
     int weapon;
     int head;
     int torso;
     int leg;
     int arm;
     int boot;
-} equipment;
+} equipment_s;
 
-typedef struct {
+typedef struct stats {
     uint8_t strength;
     uint8_t agility;
     uint8_t intelligence;
@@ -145,18 +146,18 @@ typedef struct {
     int attack_power;
     int defense;
     int attack_speed;
-} stats;
+} stats_s;
 
-typedef struct {
+typedef struct character {
     char name[LEN_NAME_CHARACTER];
-    job job;
-    stats stats;
-    item_instance inventory[MAX_INVENTORY];
+    job_e job;
+    stats_s stats;
+    item_instance_s inventory[MAX_INVENTORY];
     size_t inventory_size;
-    equipment equipment;
-} character;
+    equipment_s equipment;
+} character_s;
 
-extern item_definition item_table[MAX_ITEM];
-extern stats stats_table[JOB_COUNT];
+extern item_definition_s item_table[MAX_ITEM];
+extern stats_s stats_table[JOB_COUNT];
 
 #endif

@@ -20,19 +20,19 @@ int string_case_compare(char str1[], char str2[]) {
 #endif
 }
 
-// Helper swap function for bubble sort
-void struct_swap(character *a, character *b) {
-    character temp = *a;
+// swap function for bubble sort
+static void struct_swap(character_s *a, character_s *b) {
+    character_s temp = *a;
     *a = *b;
     *b = temp;
 }
 
-// Bubble sort that handles type and order
-void array_sort(character party[], size_t array_size, sort sort_id,
-                order order_id) {
-    for (size_t i = 0; i < array_size; i++) {
+// bubble sort party by type and order
+static void party_sort(character_s party[], size_t party_size, sort_e sort_id,
+                       order_e order_id) {
+    for (size_t i = 0; i < party_size - 1; i++) {
         bool swapped = false;
-        for (size_t j = 0; j < array_size - i - 1; j++) {
+        for (size_t j = 0; j < party_size - i - 1; j++) {
             uint8_t a, b;
             char str1[LEN_NAME_CHARACTER], str2[LEN_NAME_CHARACTER];
             switch (sort_id) {
@@ -64,10 +64,11 @@ void array_sort(character party[], size_t array_size, sort sort_id,
                 strcpy(str1, party[j].name);
                 strcpy(str2, party[j + 1].name);
                 break;
-            case SORT_COUNT:
+            default:
                 clear_terminal();
-                printf("%s", get_sort_string(SORT_COUNT));
-                break;
+                printf("ERROR: SORT UNDEFINED\n");
+                wait_enter();
+                return;
             }
             if (sort_id != SORT_NAME) {
                 switch (order_id) {
@@ -83,10 +84,11 @@ void array_sort(character party[], size_t array_size, sort sort_id,
                         swapped = true;
                     }
                     break;
-                case ORDER_COUNT:
+                default:
                     clear_terminal();
-                    printf("%s", get_order_string(ORDER_COUNT));
-                    break;
+                    printf("ERROR: ORDER UNDEFINED\n");
+                    wait_enter();
+                    return;
                 }
             } else {
                 switch (order_id) {
@@ -102,9 +104,10 @@ void array_sort(character party[], size_t array_size, sort sort_id,
                         swapped = true;
                     }
                     break;
-                case ORDER_COUNT:
+                default:
                     clear_terminal();
-                    printf("%s", get_order_string(ORDER_COUNT));
+                    printf("ERROR: ORDER UNDEFINED\n");
+                    wait_enter();
                     break;
                 }
             }
@@ -115,185 +118,239 @@ void array_sort(character party[], size_t array_size, sort sort_id,
     }
 }
 
-// Allows the user to enter and assign a name to a character
-static void add_name(character *character) {
+// assign name to character
+static void add_name(character_s *character) {
     char name[LEN_NAME_CHARACTER];
-    status name_status;
+    status_e name_status;
+
     while (true) {
         clear_terminal();
         printf("Name: ");
-        name_status = clean_input(name, sizeof(name));
-        if (name_status == STATUS_OKAY) {
+        name_status = clean_input_string(name, sizeof(name));
+        if (name_status == STATUS_OK) {
             strcpy(character->name, name);
             return;
         } else {
-            read_status(name_status);
+            clear_terminal();
+            print_status(name_status);
+            wait_enter();
         }
     }
 }
 
-// Allows the user to select and assign a job to a character
-static void add_job(character *character) {
-    status job_status;
-    int job_id;
+// assign job to character
+static void add_job(character_s *character) {
+    status_e input_status;
+    int input;
+
     while (true) {
         clear_terminal();
         for (int i = 0; i < JOB_COUNT; i++) {
-            printf("%d| %s\n", i + 1, get_job_string(i));
+            printf("%d | %s\n", i + 1, get_job_string(i));
         }
-        printf("\n> ");
-        job_status = clean_input_int(&job_id, 1);
-        if (job_status == STATUS_OKAY) {
-            job_id--;
-            if (job_id < JOB_COUNT && job_id >= 0) {
-                character->job = job_id;
-                character->stats = stats_table[job_id];
-                return;
-            } else {
-                job_status = STATUS_INVALID_OPTION;
-                read_status(job_status);
-            }
-        } else {
-            read_status(job_status);
+        print_carrot();
+
+        input_status = clean_input_int(&input);
+        switch (validate_input(&input, &input_status, JOB_COUNT)) {
+        case INPUT_VALID:
+            character->job = input;
+            character->stats = stats_table[input];
+            return;
+        case INPUT_Q:
+            break;
+        case INPUT_ERROR:
+            clear_terminal();
+            print_status(input_status);
+            wait_enter();
+            break;
         }
     }
 }
 
-// Creates a new character struct in party
-void add_character(character party[], size_t *party_size) {
+// add new character to party
+void add_character(character_s party[], size_t *party_size) {
     int index = *party_size;
-    if (*party_size < MAX_PARTY) {
-        add_name(&party[index]);
-        add_job(&party[index]);
-        party[index].inventory_size = 0;
-        (*party_size)++;
-        print_character(party[index]);
-    } else {
-        read_status(STATUS_LIST_FULL);
+
+    if (*party_size >= MAX_PARTY) {
+        clear_terminal();
+        print_status(STATUS_PARTY_FULL);
+        wait_enter();
+        return;
     }
+
+    add_name(&party[index]);
+    add_job(&party[index]);
+    party[index].inventory_size = 0;
+    (*party_size)++;
+    clear_terminal();
+    print_character(party[index]);
+    wait_enter();
 }
 
-// Removes a character from the party array by shifting values to the left then
-// setting the memory to 0
-void remove_character(character party[], size_t *party_size) {
-    status input_status;
+// remove character from party and destroy memory
+void remove_character(character_s party[], size_t *party_size) {
+    status_e input_status;
     int input;
-    if (*party_size > 0) {
-        while (true) {
-            print_party(party, *party_size);
-            print_back();
-            input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, *party_size)) {
-            case SELECTION_VALID:
-                if (input >= 0 && (size_t)input < *party_size) {
-                    for (size_t i = input; i < *party_size - 1; i++) {
-                        party[i] = party[i + 1];
-                    }
-                    memset(&party[*party_size - 1], '\0', sizeof(character));
-                    (*party_size)--;
-                    if (*party_size == 0) {
-                        return;
-                    }
-                } else {
-                    read_status(STATUS_INVALID_OPTION);
-                }
-                break;
-            case SELECTION_BACK:
-                return;
-            case SELECTION_INVALID:
-                break;
+
+    if (*party_size <= 0) {
+        clear_terminal();
+        print_status(STATUS_PARTY_EMPTY);
+        wait_enter();
+        return;
+    }
+
+    while (true) {
+        clear_terminal();
+        print_party(party, *party_size);
+        print_back();
+        print_carrot();
+
+        input_status = clean_input_int(&input);
+        switch (validate_input(&input, &input_status, *party_size)) {
+        case INPUT_VALID:
+            for (size_t i = input; i < *party_size - 1; i++) {
+                party[i] = party[i + 1];
             }
+            memset(&party[*party_size - 1], '\0', sizeof(character_s));
+            (*party_size)--;
+            if (*party_size == 0) {
+                return;
+            }
+            break;
+        case INPUT_Q:
+            return;
+        case INPUT_ERROR:
+            clear_terminal();
+            print_status(input_status);
+            wait_enter();
+            break;
         }
-    } else {
-        read_status(STATUS_EMPTY);
     }
 }
 
-// Opens menu to select invididual characters and view their name, job, stats
-void view_character(const character party[], size_t party_size) {
+// view party character information
+void view_character(const character_s party[], const size_t party_size) {
     int input;
-    status input_status;
-    if (party_size > 0) {
-        while (true) {
-            print_party(party, party_size);
-            print_back();
-            input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, party_size)) {
-            case SELECTION_VALID:
-                print_character(party[input]);
-                break;
-            case SELECTION_BACK:
-                return;
-            case SELECTION_INVALID:
-                break;
-            }
+    status_e input_status;
+
+    if (party_size <= 0) {
+        clear_terminal();
+        print_status(STATUS_PARTY_EMPTY);
+        wait_enter();
+        return;
+    }
+    while (true) {
+        clear_terminal();
+        print_party(party, party_size);
+        print_back();
+        print_carrot();
+
+        input_status = clean_input_int(&input);
+        switch (validate_input(&input, &input_status, party_size)) {
+        case INPUT_VALID:
+            clear_terminal();
+            print_character(party[input]);
+            wait_enter();
+            break;
+        case INPUT_Q:
+            return;
+        case INPUT_ERROR:
+            clear_terminal();
+            print_status(input_status);
+            wait_enter();
+            break;
         }
-    } else {
-        read_status(STATUS_EMPTY);
     }
 }
 
-// Allows the user to swap the job of a party member
-void change_character(character party[], const size_t party_size) {
+// change job of character
+void change_character(character_s party[], const size_t party_size) {
     int input;
-    status input_status;
-    if (party_size > 0) {
-        while (true) {
-            print_party(party, party_size);
-            print_back();
-            input_status = clean_input_int(&input, 1);
-            switch (validate_input(&input, input_status, party_size)) {
-            case SELECTION_VALID:
-                add_job(&party[input]);
-                print_character(party[input]);
-                break;
-            case SELECTION_BACK:
-                return;
-            case SELECTION_INVALID:
-                break;
-            }
+    status_e input_status;
+
+    if (party_size <= 0) {
+        clear_terminal();
+        print_status(STATUS_PARTY_EMPTY);
+        wait_enter();
+        return;
+    }
+
+    while (true) {
+        clear_terminal();
+        print_party(party, party_size);
+        print_back();
+        print_carrot();
+
+        input_status = clean_input_int(&input);
+        switch (validate_input(&input, &input_status, party_size)) {
+        case INPUT_VALID:
+            add_job(&party[input]);
+            clear_terminal();
+            print_character(party[input]);
+            wait_enter();
+            break;
+        case INPUT_Q:
+            return;
+        case INPUT_ERROR:
+            clear_terminal();
+            print_status(input_status);
+            wait_enter();
+            break;
         }
-    } else {
-        read_status(STATUS_EMPTY);
     }
 }
 
-// Opens a menu that allows the user to select a sort method then order
-void sort_character(character party[], size_t party_size) {
-    status sort_status, order_status;
+// sort party character by sort type and order
+void sort_character(character_s party[], const size_t party_size) {
+    status_e sort_status, order_status;
     int sort, order;
-    if (party_size > 0) {
-        while (true) {
-            print_sort();
-            print_back();
-            sort_status = clean_input_int(&sort, 1);
-            switch (validate_input(&sort, sort_status, SORT_COUNT)) {
-            case SELECTION_VALID:
-                while (true) {
-                    print_order();
-                    printf("\n> ");
-                    order_status = clean_input_int(&order, 1);
-                    switch (validate_input(&order, order_status, ORDER_COUNT)) {
-                    case SELECTION_VALID:
-                        array_sort(party, party_size, sort, order);
-                        print_party(party, party_size);
-                        wait_enter();
-                        return;
-                    case SELECTION_BACK:
-                        read_status(STATUS_INVALID_OPTION);
-                        break;
-                    case SELECTION_INVALID:
-                        break;
-                    }
+
+    if (party_size <= 0) {
+        clear_terminal();
+        print_status(STATUS_PARTY_EMPTY);
+        wait_enter();
+        return;
+    }
+
+    while (true) {
+        clear_terminal();
+        print_sort();
+        print_back();
+        print_carrot();
+
+        sort_status = clean_input_int(&sort);
+        switch (validate_input(&sort, &sort_status, SORT_COUNT)) {
+        case INPUT_VALID:
+            while (true) {
+                clear_terminal();
+                print_order();
+                print_carrot();
+
+                order_status = clean_input_int(&order);
+                switch (validate_input(&order, &order_status, ORDER_COUNT)) {
+                case INPUT_VALID:
+                    party_sort(party, party_size, sort, order);
+                    clear_terminal();
+                    print_party(party, party_size);
+                    wait_enter();
+                    return;
+                case INPUT_Q:
+                    break;
+                case INPUT_ERROR:
+                    clear_terminal();
+                    print_status(order_status);
+                    wait_enter();
+                    break;
                 }
-                break;
-            case SELECTION_BACK:
-                return;
-            case SELECTION_INVALID:
-                break;
             }
+            break;
+        case INPUT_Q:
+            return;
+        case INPUT_ERROR:
+            clear_terminal();
+            print_status(sort_status);
+            wait_enter();
+            break;
         }
-    } else {
-        read_status(STATUS_EMPTY);
     }
 }

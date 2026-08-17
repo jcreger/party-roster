@@ -1,4 +1,3 @@
-#include "print.h"
 #include "types.h"
 
 #include <assert.h>
@@ -9,22 +8,25 @@
 
 const int MENU_DELAY = 1000;
 
-// Delay function with minimal truncating
+// delay function
 void delay(int milliseconds) {
     clock_t start = clock();
     while ((clock() - start) * 1000 / CLOCKS_PER_SEC < milliseconds)
         ;
 }
 
-// Cleans user input and will return status
-int clean_input(char string[], const size_t string_size) {
+// return status, flush stdin buffer, strip '\n'
+// due to the termination character the size is effectively -1
+status_e clean_input_string(char string[], const size_t string_size) {
     assert(string_size >= 1);
+
     if (fgets(string, string_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
     }
     if (string[0] == '\n') {
         return STATUS_INVALID_INPUT;
     }
+
     if (strchr(string, '\n') == NULL) {
         int c = getchar();
         if (c != '\n' && c != EOF) {
@@ -32,73 +34,84 @@ int clean_input(char string[], const size_t string_size) {
                 ;
             memset(string, '\0', string_size);
             return STATUS_LONG_INPUT;
+        } else {
+            return STATUS_OK;
         }
-        return STATUS_OKAY;
     } else {
         string[strcspn(string, "\n")] = '\0';
-        return STATUS_OKAY;
+        return STATUS_OK;
     }
 }
 
-// Cleans user input and converts string to integer return status
-status clean_input_int(int *num, int digit_count) {
-    char string[digit_count + 1];
-    size_t string_size = sizeof(string);
-    *num = 0;
-    if (fgets(string, string_size, stdin) == NULL) {
+// return status, flush stdin buffer, strip '\n', convert to int
+// due to the termination character the size is effectively -1
+status_e clean_input_int(int *num) {
+    char buffer[MAX_INPUT];
+    size_t buffer_size = sizeof(buffer);
+
+    *num = -1;
+
+    if (fgets(buffer, buffer_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
     }
-    if (strchr(string, '\n') == NULL) {
+    if (buffer[0] == '\n') {
+        return STATUS_INVALID_INPUT;
+    }
+
+    if (strchr(buffer, '\n') == NULL) {
         int c = getchar();
         if (c != '\n' && c != EOF) {
             while ((c = getchar()) != '\n' && c != EOF)
                 ;
-            memset(string, '\0', string_size);
+            memset(buffer, '\0', buffer_size);
             return STATUS_LONG_INPUT;
         }
     } else {
-        string[strcspn(string, "\n")] = '\0';
+        buffer[strcspn(buffer, "\n")] = '\0';
     }
-    if (string[0] == 'q' && string[1] == '\0') {
+
+    if ((buffer[0] == 'q' || buffer[0] == 'Q') && buffer[1] == '\0') {
         return STATUS_Q;
     }
-    if (string[0] == '0' && string[1] == '\0') {
-        *num = atoi(string);
-        return STATUS_OKAY;
+    if (buffer[0] == '0' && buffer[1] == '\0') {
+        *num = atoi(buffer);
+        return STATUS_OK;
     }
-    if (atoi(string) != 0) {
-        *num = atoi(string);
-        return STATUS_OKAY;
+
+    if (atoi(buffer) != 0) {
+        *num = atoi(buffer);
+        return STATUS_OK;
+    } else {
+        return STATUS_INVALID_INPUT;
     }
-    return STATUS_INVALID_INPUT;
 }
 
-// Validates integer input of a user works for a menu and returns codes for the
-// selection
-selection validate_input(int *input, const status input_status,
-                         const size_t size) {
-    if (input_status == STATUS_Q) {
-        return SELECTION_BACK;
+// validate input works for a menu and return code
+input_e validate_input(int *input, status_e *input_status, const size_t count) {
+    if (*input_status == STATUS_Q) {
+        return INPUT_Q;
     }
-    if (input_status != STATUS_OKAY) {
-        read_status(input_status);
-        return SELECTION_INVALID;
+    if (*input_status != STATUS_OK) {
+        return INPUT_ERROR;
     }
     if (*input == 0) {
-        read_status(STATUS_INVALID_OPTION);
-        return SELECTION_INVALID;
+        *input_status = STATUS_INVALID_OPTION;
+        return INPUT_ERROR;
     }
+
     (*input)--;
-    if (*input >= 0 && (size_t)*input < size) {
-        return SELECTION_VALID;
+    if (*input >= 0 && (size_t)*input < count) {
+        return INPUT_VALID;
+    } else {
+        *input_status = STATUS_INVALID_OPTION;
+        return INPUT_ERROR;
     }
-    read_status(STATUS_INVALID_OPTION);
-    return SELECTION_INVALID;
 }
 
-// Waits until user inputs anything to continue
+// wait for user input to continue
 void wait_enter(void) {
     char input;
+
     printf("\npress enter to continue...");
-    clean_input(&input, sizeof(input));
+    clean_input_string(&input, sizeof(input));
 }

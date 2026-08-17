@@ -1,6 +1,7 @@
 #include "types.h"
 
-item_definition item_table[MAX_ITEM] = {
+item_definition_s item_table[MAX_ITEM] = {
+
     [ITEM_SWORD_COPPER] = {.name = "Copper Sword",
                            .value = 50,
                            .type = TYPE_WEAPON,
@@ -16,14 +17,14 @@ item_definition item_table[MAX_ITEM] = {
     [ITEM_POTION] = {.name = "Potion",
                      .value = 10,
                      .type = TYPE_RECOVERY,
-                     .data.recovery.heal_amount = 20},
+                     .data.healing.heal_amount = 20},
 
     [ITEM_KEY] = {.name = "Key",
                   .value = 0,
                   .type = TYPE_QUEST,
                   .data.quest.quest_id = 0}};
 
-stats stats_table[JOB_COUNT] = {
+stats_s stats_table[JOB_COUNT] = {
 
     [JOB_FIGHTER] = {.strength = 20,
                      .agility = 10,

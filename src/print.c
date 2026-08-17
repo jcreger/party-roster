@@ -1,13 +1,21 @@
-#include "input.h"
 #include "types.h"
 
 #include <inttypes.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include <stdio.h.>
 #include <stdlib.h>
 
-// returns job string literal to be used in printf
-const char *get_job_string(const job job_id) {
+// clear terminal with OS specific system call
+void clear_terminal(void) {
+#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
+    system("clear");
+#endif
+#if defined(_WIN32) || defined(_WIN64)
+    system("cls");
+#endif
+}
+
+// return string literal of job id
+const char *get_job_string(const job_e job_id) {
     switch (job_id) {
     case JOB_FIGHTER:
         return "Fighter";
@@ -22,193 +30,166 @@ const char *get_job_string(const job job_id) {
     case JOB_ASSASSIN:
         return "Assassin";
     default:
-        return "JOB UNDEFINED";
+        return "ERROR: JOB STRING UNDEFINED";
     }
 }
 
-// returns menu string literal to be used in printf
-const char *get_menu_string(const menu_option option_id) {
+// return string literal of option id
+const char *get_menu_string(const menu_main_e option_id) {
     switch (option_id) {
     case MENU_ADD:
-        return "Add a character";
+        return "Add Character";
     case MENU_VIEW:
-        return "View party";
+        return "View Party";
     case MENU_CHANGE:
-        return "Change job";
+        return "Change Job";
     case MENU_REMOVE:
-        return "Remove a character";
+        return "Remove Character";
     case MENU_SORT:
-        return "Sort characters";
+        return "Sort Characters";
     case MENU_INVENTORY:
-        return "Open inventory";
+        return "Open Inventory";
     case MENU_ITEM_ADD:
-        return "Add item";
+        return "Add Item";
     case MENU_ITEM_REMOVE:
-        return "Remove item";
+        return "Remove Item";
     case MENU_QUIT:
         return "Quit";
     default:
-        return "MENU UNDEFINED";
+        return "ERROR: MENU STRING UNDEFINED";
     }
 }
 
-// returns sort string literal to be used in printf
-const char *get_sort_string(const sort sort_id) {
+// return string literal of sort id
+const char *get_sort_string(const sort_e sort_id) {
     switch (sort_id) {
     case SORT_NAME:
-        return "Sort by Name";
+        return "Sort Name";
     case SORT_STRENGTH:
-        return "Sort by Strength";
+        return "Sort Strength";
     case SORT_AGILITY:
-        return "Sort by Agility";
+        return "Sort Agility";
     case SORT_INTELLIGENCE:
-        return "Sort by Intelligence";
+        return "Sort Intelligence";
     case SORT_STAMINA:
-        return "Sort by Stamina";
+        return "Sort Stamina";
     case SORT_RESILIENCE:
-        return "Sort by Resilience";
+        return "Sort Resilience";
     case SORT_SPIRIT:
-        return "Sort by Spirit";
+        return "Sort Spirit";
     default:
-        return "SORT UNDEFINED";
+        return "ERROR: SORT STRING UNDEFINED";
     }
 }
 
-// returns order string literal to be used in printf
-const char *get_order_string(const order order_id) {
+// return string literal of order id
+const char *get_order_string(const order_e order_id) {
     switch (order_id) {
     case ORDER_ASCENDING:
-        return "Order by Ascending";
+        return "Order Ascending";
     case ORDER_DESCENDING:
-        return "Order by Descending";
+        return "Order Descending";
     default:
-        return "ORDER UNDEFINED";
+        return "ERROR: ORDER STRING UNDEFINED";
     }
 }
 
-const char *get_slot_string(const armor_slot slot_id) {
+// return string literal of slot id
+const char *get_slot_string(const armor_slot_e slot_id) {
     switch (slot_id) {
     case SLOT_HEAD:
-        return "HELMET";
+        return "Head";
     case SLOT_CHEST:
-        return "CHEST";
-    case SLOT_LEG:
-        return "LEGS";
-    case SLOT_GLOVE:
-        return "GLOVES";
-    case SLOT_BOOT:
-        return "BOOTS";
+        return "Chest";
+    case SLOT_LEGS:
+        return "Leg";
+    case SLOT_HANDS:
+        return "Hands";
+    case SLOT_FEET:
+        return "Feet";
     default:
-        return "SLOT UNDEFINED";
+        return "ERROR: ARMOR SLOT STRING UNDEFINED";
     }
 }
 
-const char *get_type_string(const item_type type_id) {
+// return string literal of type id
+const char *get_type_string(const item_type_e type_id) {
     switch (type_id) {
     case TYPE_WEAPON:
-        return "WEAPON";
+        return "Weapon";
     case TYPE_ARMOR:
-        return "ARMOR";
+        return "Armor";
     case TYPE_RECOVERY:
-        return "RECOVERY";
+        return "Recovery";
     case TYPE_QUEST:
-        return "QUEST";
+        return "Quest";
     default:
-        return "TYPE UNDEFINED";
+        return "ERROR: TYPE STRING UNDEFINED";
     }
 }
 
-void clear_terminal(void) {
-#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
-    system("clear");
-#endif
-#if defined(_WIN32) || defined(_WIN64)
-    system("cls");
-#endif
-}
-
-// Print user error messages
-void read_status(status status_id) {
-    clear_terminal();
+// print status message
+void print_status(const status_e status_id) {
     switch (status_id) {
     case STATUS_NULL_INPUT:
-        printf("You cannot input NULL");
+        printf("ERROR: CANNOT INPUT NULL\n");
         break;
     case STATUS_LONG_INPUT:
-        printf("Input too long");
+        printf("ERROR: INPUT TOO LONG\n");
         break;
     case STATUS_INVALID_INPUT:
-        printf("Invalid Input");
+        printf("ERROR: INVALID INPUT\n");
         break;
-    case STATUS_LIST_FULL:
-        printf("List Full");
+    case STATUS_PARTY_FULL:
+        printf("ERROR: PARTY FULL\n");
         break;
     case STATUS_NOT_FOUND:
-        printf("Not found");
+        printf("ERROR: NOT FOUND\n");
         break;
-    case STATUS_EMPTY:
-        printf("Party is empty");
+    case STATUS_PARTY_EMPTY:
+        printf("ERROR: PARTY EMPTY\n");
         break;
     case STATUS_INVALID_OPTION:
-        printf("Not an option");
+        printf("ERROR: INVALID OPTION\n");
         break;
-    case STATUS_INV_EMPTY:
-        printf("Inventory is empty");
+    case STATUS_INVENTORY_EMPTY:
+        printf("ERROR: INVENTORY EMPTY\n");
         break;
-    case STATUS_Q:
-        printf("Q is selected");
-        break;
-    case STATUS_INV_FULL:
-        printf("Inventory is full");
+    case STATUS_INVENTORY_FULL:
+        printf("ERROR: INVENTORY FULL\n");
         break;
     default:
+        printf("ERROR: STATUS UNDEFINED\n");
         break;
     }
-    wait_enter();
 }
 
-// prints a menu for the entire party
-void print_party(const character party[], size_t party_size) {
-    clear_terminal();
+// print party list
+void print_party(const character_s party[], const size_t party_size) {
     for (size_t i = 0; i < party_size; i++) {
-        printf("%zu| %s\n", i + 1, party[i].name);
+        printf("%zu | %s\n", i + 1, party[i].name);
     }
 }
 
-// prints the quit menu
-void print_back(void) {
-    printf("\nq| Back\n\n");
-    printf("> ");
-}
+// print back
+void print_back(void) { printf("\nQ | Back\n"); }
 
-// print the main menu and return valid user input, returns the user input
-menu_option print_menu(const size_t party_size) {
-    int input;
-    status input_status;
-    while (true) {
-        clear_terminal();
-        printf("%zu/%d Characters\n\n", party_size, MAX_PARTY);
-        for (int i = 0; i < MENU_COUNT - 1; i++) {
-            printf("%d| %s\n", i + 1, get_menu_string(i));
-        }
-        printf("\nq| Quit\n\n> ");
-        input_status = clean_input_int(&input, 1);
-        switch (validate_input(&input, input_status, MENU_COUNT - 1)) {
-        case SELECTION_VALID:
-            return input;
-        case SELECTION_BACK:
-            return MENU_QUIT;
-            read_status(STATUS_INVALID_OPTION);
-            break;
-        case SELECTION_INVALID:
-            break;
-        }
+// print input carrot
+void print_carrot(void) { printf("\n> "); }
+
+// print menu
+void print_menu(const size_t party_size) {
+    printf("%zu / %d Characters\n\n", party_size, MAX_PARTY);
+
+    for (int i = 0; i < MENU_COUNT - 1; i++) {
+        printf("%d | %s\n", i + 1, get_menu_string(i));
     }
+    printf("\nQ | Quit\n");
+    print_carrot();
 }
 
-// prints information of a character
-void print_character(const character character) {
-    clear_terminal();
+// print character information
+void print_character(const character_s character) {
     printf("Name: %s\n\nJob: %s\n\nStrength: %" PRIu8 "\nAgility: %" PRIu8
            "\nIntelligence: %" PRIu8 "\nStamina: %" PRIu8
            "\nResilience: %" PRIu8 "\nSpirit: %" PRIu8 "\n",
@@ -216,60 +197,59 @@ void print_character(const character character) {
            character.stats.strength, character.stats.agility,
            character.stats.intelligence, character.stats.stamina,
            character.stats.resilience, character.stats.spirit);
-    wait_enter();
 }
 
-// prints the sorting menu
+// print sorting menu
 void print_sort(void) {
-    clear_terminal();
     for (int i = 0; i < SORT_COUNT; i++) {
         printf("%d| %s\n", i + 1, get_sort_string(i));
     }
 }
 
-// prints the ordering menu
+// print ordering menu
 void print_order(void) {
-    clear_terminal();
     for (int i = 0; i < ORDER_COUNT; i++) {
         printf("%d| %s\n", i + 1, get_order_string(i));
     }
 }
 
-void print_item(const item_definition item) {
-    printf("NAME: %s\nTYPE: %s\nVALUE: %d\n", item.name,
+// print item information
+void print_item(const item_definition_s item) {
+    printf("Name: %s\nType: %s\nValue: %d\n", item.name,
            get_type_string(item.type), item.value);
+
     switch (item.type) {
     case TYPE_WEAPON:
-        printf("DAMAGE: %d\nATKSPD: %d\n", item.data.weapon.attack_power,
-               item.data.weapon.attack_speed);
+        printf("Attack Power: %d\nAttack Speed: %d\n",
+               item.data.weapon.attack_power, item.data.weapon.attack_speed);
         break;
     case TYPE_ARMOR:
-        printf("DEFENSE: %d\nSLOT: %s\n", item.data.armor.defense,
+        printf("Defense: %d\nSslot: %s\n", item.data.armor.defense,
                get_slot_string(item.data.armor.slot));
         break;
     case TYPE_RECOVERY:
-        printf("HEAL: %d\n", item.data.recovery.heal_amount);
+        printf("Healing: %d\n", item.data.healing.heal_amount);
         break;
     case TYPE_QUEST:
-        printf("ID: %d\n", item.data.quest.quest_id);
+        printf("Quest ID: %d\n", item.data.quest.quest_id);
         break;
     default:
-        printf("ITEM UNDEFINED\n");
+        printf("ERROR: ITEM TYPE UNDEFINED\n");
         break;
     }
 }
 
-void print_inventory(const item_instance inventory[],
+// print item inventory
+void print_inventory(const item_instance_s inventory[],
                      const size_t inventory_size) {
-    clear_terminal();
     for (size_t i = 0; i < inventory_size; i++) {
         printf("%zu | x%d | %s\n", i + 1, inventory[i].quantity,
-               item_table[inventory[i].item_id].name);
+               item_table[inventory[i].item].name);
     }
 }
 
+// print item table
 void print_item_table(void) {
-    clear_terminal();
     for (int i = 0; i < ITEM_COUNT; i++) {
         printf("%d | %s\n", i + 1, item_table[i].name);
     }
