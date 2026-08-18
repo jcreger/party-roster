@@ -4,3 +4,5 @@ CompileFlags:
     - -Wextra
     - -Wpedantic
     - -I../include
+    - -std=c17
+    - -xc

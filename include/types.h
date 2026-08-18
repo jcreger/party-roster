@@ -1,6 +1,10 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#if !defined __STDC_VERSION__ || __STDC_VERSION__ < 201710L
+#error "This project requires C17 or later (compile with -std=c17)"
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
