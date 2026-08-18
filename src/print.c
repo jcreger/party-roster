@@ -1,7 +1,7 @@
 #include "types.h"
 
 #include <inttypes.h>
-#include <stdio.h.>
+#include <stdio.h>
 #include <stdlib.h>
 
 // clear terminal with OS specific system call
