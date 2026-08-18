@@ -67,10 +67,13 @@ item_e select_item(void) {
     }
 }
 
-// remove item from inventory instance
-void remove_item(const item_e item, item_instance_s inventory[],
+// remove item from inventory instance reallocates memory, handles rollback
+void remove_item(const item_e item, item_instance_s **inventory,
                  size_t *inventory_size) {
-    if (*inventory_size <= 0) {
+    item_instance_s *temp;
+    item_instance_s item_buffer;
+
+    if (*inventory_size == 0) {
         clear_terminal();
         print_status(STATUS_INVENTORY_EMPTY);
         wait_enter();
@@ -78,17 +81,43 @@ void remove_item(const item_e item, item_instance_s inventory[],
     }
 
     for (size_t i = 0; i < *inventory_size; i++) {
-        if (inventory[i].item == item) {
-            inventory[i].quantity--;
-            if (inventory[i].quantity == 0) {
-                for (size_t j = i; j < *inventory_size - 1; j++) {
-                    inventory[j] = inventory[j + 1];
-                }
-                memset(&inventory[*inventory_size - 1], '\0',
-                       sizeof(item_instance_s));
-                (*inventory_size)--;
-                i--;
+        if ((*inventory)[i].item == item) {
+
+            if ((*inventory)[i].quantity > 1) {
+                (*inventory)[i].quantity--;
+                return;
             }
+
+            item_buffer = (*inventory)[i];
+
+            for (size_t j = i; j < *inventory_size - 1; j++) {
+                (*inventory)[j] = (*inventory)[j + 1];
+            }
+            (*inventory_size)--;
+            if (*inventory_size == 0) {
+                free(*inventory);
+                *inventory = NULL;
+                return;
+            }
+
+            temp = realloc(*inventory,
+                           (*inventory_size) * sizeof(item_instance_s));
+            if (temp == NULL) {
+                // handles rollback my head hurts
+                (*inventory_size)++;
+                for (size_t k = *inventory_size - 1; k > i; k--) {
+                    (*inventory)[k] = (*inventory)[k - 1];
+                }
+                (*inventory)[i] = item_buffer;
+
+                clear_terminal();
+                print_status(STATUS_REALLOC_FAIL);
+                wait_enter();
+                return;
+            }
+
+            *inventory = temp;
+
             return;
         }
     }
@@ -242,7 +271,7 @@ void remove_inventory(character_s party[], const size_t party_size) {
                 return;
             }
 
-            remove_item(item, party[input].inventory,
+            remove_item(item, &party[input].inventory,
                         &party[input].inventory_size);
             return;
         case INPUT_Q:

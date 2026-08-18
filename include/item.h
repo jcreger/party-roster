@@ -5,10 +5,10 @@
 
 #include <stddef.h>
 
-void add_item(const item_e item, item_instance_s inventory[],
+void add_item(const item_e item, item_instance_s **inventory,
               size_t *inventory_size);
 item_e select_item(void);
-void remove_item(const item_e item, item_instance_s inventory[],
+void remove_item(const item_e item, item_instance_s **inventory,
                  size_t *inventory_size);
 void view_inventory(const character_s party[], const size_t party_size);
 void add_inventory(character_s party[], const size_t party_size);

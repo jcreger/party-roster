@@ -41,6 +41,10 @@ static void struct_swap(character_s *a, character_s *b) {
 // bubble sort party by type and order
 static void party_sort(character_s party[], size_t party_size, sort_e sort_id,
                        order_e order_id) {
+    if (party_size == 0) {
+        return;
+    }
+
     for (size_t i = 0; i < party_size - 1; i++) {
         bool swapped = false;
         for (size_t j = 0; j < party_size - i - 1; j++) {
