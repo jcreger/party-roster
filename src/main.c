@@ -33,15 +33,17 @@ menu_main_e menu_main(const size_t party_size) {
 }
 
 void free_party(character_s party[], const size_t party_size) {
+    size_t memory = 0;
+
     for (size_t i = 0; i < party_size; i++) {
-        clear_terminal();
-        printf("FREE: %zu BYTES OF DATA\n",
-               sizeof(item_instance_s) * party[i].inventory_size);
-        wait_enter();
+        memory = memory + sizeof(item_instance_s) * party[i].inventory_size;
         free(party[i].inventory);
         party[i].inventory = NULL;
         party[i].inventory_size = 0;
     }
+    clear_terminal();
+    printf("FREE: %zu BYTES OF MEMORY\n", memory);
+    wait_enter();
 }
 
 int main(void) {

@@ -23,7 +23,7 @@ int string_case_compare(char str1[], char str2[]) {
 
 void free_character(character_s *character) {
     clear_terminal();
-    printf("FREE: %zu BYTES OF MEMORY",
+    printf("FREE: %zu BYTES OF MEMORY\n",
            sizeof(item_instance_s) * character->inventory_size);
     wait_enter();
     free(character->inventory);

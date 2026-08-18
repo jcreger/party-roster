@@ -49,7 +49,7 @@ status_e clean_input_int(int *num) {
     char buffer[MAX_INPUT];
     size_t buffer_size = sizeof(buffer);
 
-    *num = -1;
+    *num = -1;  // prevents validate_input from reading undefined garbage
 
     if (fgets(buffer, buffer_size, stdin) == NULL) {
         return STATUS_NULL_INPUT;
