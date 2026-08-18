@@ -25,6 +25,7 @@ void free_character(character_s *character) {
     clear_terminal();
     printf("FREE: %zu BYTES OF MEMORY",
            sizeof(item_instance_s) * character->inventory_size);
+    wait_enter();
     free(character->inventory);
     character->inventory = NULL;
     character->inventory_size = 0;
