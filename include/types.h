@@ -59,6 +59,8 @@ typedef enum status {
     STATUS_INVENTORY_EMPTY,
     STATUS_Q,
     STATUS_INVENTORY_FULL,
+    STATUS_MALLOC_FAIL,
+    STATUS_REALLOC_FAIL,
 } status_e;
 
 typedef enum input { INPUT_VALID, INPUT_Q, INPUT_ERROR } input_e;
@@ -152,7 +154,7 @@ typedef struct character {
     char name[LEN_NAME_CHARACTER];
     job_e job;
     stats_s stats;
-    item_instance_s inventory[MAX_INVENTORY];
+    item_instance_s *inventory;
     size_t inventory_size;
     equipment_s equipment;
 } character_s;

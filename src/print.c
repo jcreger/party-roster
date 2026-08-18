@@ -158,6 +158,12 @@ void print_status(const status_e status_id) {
     case STATUS_INVENTORY_FULL:
         printf("ERROR: INVENTORY FULL\n");
         break;
+    case STATUS_MALLOC_FAIL:
+        printf("ERROR: MALLOC MEMORY ALLOCATION FAIL\n");
+        break;
+    case STATUS_REALLOC_FAIL:
+        printf("ERROR: REALLOC MEMORY ALLOCATION FAIL\n");
+        break;
     default:
         printf("ERROR: STATUS UNDEFINED\n");
         break;

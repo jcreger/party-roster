@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
@@ -18,6 +19,15 @@ int string_case_compare(char str1[], char str2[]) {
 #if defined(_WIN32) || defined(_WIN64)
     return _stricmp(str1, str2);
 #endif
+}
+
+void free_character(character_s *character) {
+    clear_terminal();
+    printf("FREE: %zu BYTES OF MEMORY",
+           sizeof(item_instance_s) * character->inventory_size);
+    free(character->inventory);
+    character->inventory = NULL;
+    character->inventory_size = 0;
 }
 
 // swap function for bubble sort
@@ -180,7 +190,10 @@ void add_character(character_s party[], size_t *party_size) {
 
     add_name(&party[index]);
     add_job(&party[index]);
+
     party[index].inventory_size = 0;
+    party[index].inventory = NULL;
+
     (*party_size)++;
     clear_terminal();
     print_character(party[index]);
@@ -208,6 +221,7 @@ void remove_character(character_s party[], size_t *party_size) {
         input_status = clean_input_int(&input);
         switch (validate_input(&input, &input_status, *party_size)) {
         case INPUT_VALID:
+            free_character(&party[input]);
             for (size_t i = input; i < *party_size - 1; i++) {
                 party[i] = party[i + 1];
             }

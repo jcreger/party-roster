@@ -32,6 +32,18 @@ menu_main_e menu_main(const size_t party_size) {
     }
 }
 
+void free_party(character_s party[], const size_t party_size) {
+    for (size_t i = 0; i < party_size; i++) {
+        clear_terminal();
+        printf("FREE: %zu BYTES OF DATA\n",
+               sizeof(item_instance_s) * party[i].inventory_size);
+        wait_enter();
+        free(party[i].inventory);
+        party[i].inventory = NULL;
+        party[i].inventory_size = 0;
+    }
+}
+
 int main(void) {
     character_s party[MAX_PARTY];
     size_t party_size = 0;
@@ -65,6 +77,7 @@ int main(void) {
             remove_inventory(party, party_size);
             break;
         case MENU_QUIT:
+            free_party(party, party_size);
             clear_terminal();
             return 0;
         default:

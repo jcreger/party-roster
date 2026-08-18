@@ -3,11 +3,14 @@
 #include "types.h"
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 // add item into inventory instance
-void add_item(const item_e item, item_instance_s inventory[],
+void add_item(const item_e item_id, item_instance_s **inventory,
               size_t *inventory_size) {
+    item_instance_s *temp;
+
     if (*inventory_size >= MAX_INVENTORY) {
         clear_terminal();
         print_status(STATUS_INVENTORY_FULL);
@@ -16,14 +19,25 @@ void add_item(const item_e item, item_instance_s inventory[],
     }
 
     for (size_t i = 0; i < *inventory_size; i++) {
-        if (inventory[i].item == item) {
-            inventory[i].quantity++;
+        if ((*inventory)[i].item == item_id) {
+            (*inventory)[i].quantity++;
             return;
         }
     }
 
-    inventory[*inventory_size].item = item;
-    inventory[*inventory_size].quantity = 1;
+    temp = realloc(*inventory, (*inventory_size + 1) * sizeof(item_instance_s));
+
+    if (temp == NULL) {
+        clear_terminal();
+        print_status(STATUS_REALLOC_FAIL);
+        wait_enter();
+        return;
+    }
+
+    *inventory = temp;
+
+    (*inventory)[*inventory_size].item = item_id;
+    (*inventory)[*inventory_size].quantity = 1;
     (*inventory_size)++;
     return;
 }
@@ -147,7 +161,7 @@ void add_inventory(character_s party[], const size_t party_size) {
         switch (validate_input(&input, &input_status, party_size)) {
         case INPUT_VALID:
             item = select_item();
-            add_item(item, party[input].inventory,
+            add_item(item, &party[input].inventory,
                      &party[input].inventory_size);
             return;
         case INPUT_Q:

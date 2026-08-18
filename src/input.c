@@ -81,9 +81,8 @@ status_e clean_input_int(int *num) {
     if (atoi(buffer) != 0) {
         *num = atoi(buffer);
         return STATUS_OK;
-    } else {
-        return STATUS_INVALID_INPUT;
     }
+    return STATUS_INVALID_INPUT;
 }
 
 // validate input works for a menu and return code
@@ -102,10 +101,9 @@ input_e validate_input(int *input, status_e *input_status, const size_t count) {
     (*input)--;
     if (*input >= 0 && (size_t)*input < count) {
         return INPUT_VALID;
-    } else {
-        *input_status = STATUS_INVALID_OPTION;
-        return INPUT_ERROR;
     }
+    *input_status = STATUS_INVALID_OPTION;
+    return INPUT_ERROR;
 }
 
 // wait for user input to continue
