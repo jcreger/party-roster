@@ -25,7 +25,7 @@ Prompts the user to select a character. Selecting a character will print a list 
 9. **Quit**  
 Frees up all dynamically allocated memory then exits the program.
 
-## Building and Running
+## Building
 
 Requires GCC and `make`. Tested with MYSYS2/MinGW-w64 UCRT64 on Windows.
 
