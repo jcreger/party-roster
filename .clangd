@@ -5,3 +5,9 @@ CompileFlags:
     - -Wpedantic
     - -I../include
     - -std=c17
+---
+If:
+  PathMatch: .*\.h$
+CompileFlags:
+  Add:
+    - -xc
