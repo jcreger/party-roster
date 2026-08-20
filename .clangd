@@ -5,4 +5,3 @@ CompileFlags:
     - -Wpedantic
     - -I../include
     - -std=c17
-    - -xc
